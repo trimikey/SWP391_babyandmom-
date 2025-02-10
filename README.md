@@ -1,6 +1,6 @@
-﻿# 🌊 Koi Farm Shop
+﻿# Baby And Mom
 
-![Koi Farm Shop Screenshot](./images/Homepage.png)
+![Baby and Mom Screenshot](./images/Homepage.png)
 
 ## Introduction
 Welcome to Koi Farm Shop, a comprehensive management platform tailored for koi fish enthusiasts and businesses. 

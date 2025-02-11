@@ -2,6 +2,9 @@ package com.swp.BabyandMom.Service;
 
 import com.swp.BabyandMom.DTO.LoginRequestDTO;
 import com.swp.BabyandMom.DTO.LoginResponseDTO;
+import com.swp.BabyandMom.DTO.RegisterRequestDTO;
+import com.swp.BabyandMom.DTO.RegisterResponseDTO;
+import com.swp.BabyandMom.Entity.Enum.RoleType;
 import com.swp.BabyandMom.Entity.Enum.UserStatusEnum;
 import com.swp.BabyandMom.Entity.User;
 import com.swp.BabyandMom.ExceptionHandler.AuthAppException;
@@ -86,4 +89,44 @@ public class UserService implements UserDetailsService {
             );
         }
     }
+
+    // logic for register
+    public ResponseEntity<RegisterResponseDTO> checkRegister(RegisterRequestDTO registerRequestDTO) {
+        // Kiểm tra xem email đã tồn tại chưa
+        if (userRepository.existsByEmail(registerRequestDTO.getEmail())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new RegisterResponseDTO(null, null, null, null, "Email đã được sử dụng!"));
+        }
+
+        // Kiểm tra xem username đã tồn tại chưa
+        if (userRepository.existsByUserName(registerRequestDTO.getUserName())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new RegisterResponseDTO(null, null, null, null, "Username đã tồn tại!"));
+        }
+
+        // Tạo đối tượng User mới
+        User newUser = new User();
+        newUser.setFullName(registerRequestDTO.getName());
+        newUser.setUserName(registerRequestDTO.getUserName());
+        newUser.setEmail(registerRequestDTO.getEmail());
+        newUser.setPassword(registerRequestDTO.getPassword());
+        newUser.setRole(RoleType.MEMBER);
+        newUser.setStatus(UserStatusEnum.VERIFIED);
+
+        // Lưu user vào database
+        User savedUser = userRepository.save(newUser);
+
+        // Tạo response DTO
+        RegisterResponseDTO responseDTO = new RegisterResponseDTO(
+                savedUser.getId(),
+                savedUser.getFullName(),
+                savedUser.getUserName(),
+                savedUser.getEmail(),
+                "Registered successfully"
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+    }
+
+
 }

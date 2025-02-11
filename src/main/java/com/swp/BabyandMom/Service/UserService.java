@@ -8,130 +8,82 @@ import com.swp.BabyandMom.ExceptionHandler.AuthAppException;
 import com.swp.BabyandMom.ExceptionHandler.ErrorCode;
 import com.swp.BabyandMom.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.Arrays;
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Optional;
-import java.util.stream.Collectors;
-import org.springframework.security.core.Authentication;
 
 @Service
 public class UserService implements UserDetailsService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private JWTService jwtService;
-    @Autowired
-    @Lazy
-    private AuthenticationManager authenticationManager;
 
     public User getAccountByEmail(String email) {
         Optional<User> account = userRepository.findByEmail(email);
         return account.orElse(null);
     }
+
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserDetails userDetails = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return userDetails;
+        return userRepository.findByEmail(username).orElseThrow(() ->
+                new UsernameNotFoundException("User not found")
+        );
     }
 
     public ResponseEntity<LoginResponseDTO> checkLogin(LoginRequestDTO loginRequestDTO) {
+        logger.info("Received login request for email: {}", loginRequestDTO.getEmail());
+
         try {
             User user = getAccountByEmail(loginRequestDTO.getEmail());
 
             if (user == null) {
-                throw new AuthAppException(ErrorCode.EMAIL_NOT_FOUND);
+                logger.warn("Login failed: Email not found - {}", loginRequestDTO.getEmail());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                        new LoginResponseDTO("Email not found", "Login failed", null, null)
+                );
             }
+
             if (user.getStatus().equals(UserStatusEnum.UNVERIFIED)) {
-                throw new AuthAppException(ErrorCode.ACCOUNT_NOT_VERIFY);
-            }
-            Authentication authentication = null;
-            try {
-                authentication = authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(
-                                loginRequestDTO.getEmail(),
-                                loginRequestDTO.getPassword()
-                        )
+                logger.warn("Login failed: Account not verified - {}", loginRequestDTO.getEmail());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                        new LoginResponseDTO("Account not verified", "Login failed", null, null)
                 );
-            } catch (Exception e) {
-                throw new AuthAppException(ErrorCode.EMAIL_PASSWORD_NOT_CORRECT);
             }
 
-            System.out.println(authentication);
-
-            if (authentication != null && authentication.isAuthenticated()) {
-                User returnAccount = (User) authentication.getPrincipal();
-                user.setTokens(jwtService.generateToken(user.getEmail()));
-                user.setRefreshToken(jwtService.generateRefreshToken(user.getEmail()));
-
-                String responseString = "Login successful";
-                LoginResponseDTO loginResponseDTO = new LoginResponseDTO(
-                        responseString,
-                        null,
-                        returnAccount.getTokens(),
-                        returnAccount.getRefreshToken()
+            if (!user.getPassword().equals(loginRequestDTO.getPassword())) {
+                logger.warn("Login failed: Incorrect password - {}", loginRequestDTO.getEmail());
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                        new LoginResponseDTO("Incorrect email or password", "Login failed", null, null)
                 );
-                return new ResponseEntity<>(loginResponseDTO, HttpStatus.OK);
-            } else {
-                throw new UsernameNotFoundException("Invalid user request");
             }
+
+            String accessToken = jwtService.generateToken(user.getEmail());
+            String refreshToken = jwtService.generateRefreshToken(user.getEmail());
+
+            logger.info("Login successful: {}", loginRequestDTO.getEmail());
+
+            return ResponseEntity.ok(new LoginResponseDTO("Login successful", "Success", accessToken, refreshToken));
 
         } catch (AuthAppException e) {
-            ErrorCode errorCode = e.getErrorCode();
-            String errorResponse = "Login failed";
-            LoginResponseDTO loginResponseDTO = new LoginResponseDTO(
-                    e.getMessage(),
-                    errorResponse,
-                    null,
-                    null
+            logger.error("Authentication error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new LoginResponseDTO(e.getMessage(), "Login failed", null, null)
             );
-            return new ResponseEntity<>(loginResponseDTO, errorCode.getHttpStatus());
+        } catch (Exception e) {
+            logger.error("Unexpected error: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new LoginResponseDTO("An unexpected error occurred", "Login failed", null, null)
+            );
         }
     }
-
-    private User getUserFromToken(String token) {
-        String email = extractEmailFromToken(token);
-
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new AuthAppException(ErrorCode.TOKEN_INVALID));
-    }
-
-    private String extractEmailFromToken(String token) {
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
-        String email = jwtService.extractEmail(token);
-
-        if (email == null || email.isEmpty()) {
-            throw new AuthAppException(ErrorCode.TOKEN_INVALID);
-        }
-
-        return email;
-    }
-
-    //Sau nay phai doi lai 1 chut
-    private List<Integer> parseListToInterger(String wishlist) {
-        return Arrays.stream(wishlist.split(","))
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
-    }
-
-    //Dat lai ten
-    private String getString(String token) {
-        String email = jwtService.extractEmail(token);
-        if (email == null || email.isEmpty()) {
-            throw new AuthAppException(ErrorCode.TOKEN_INVALID);
-        }
-        return email;
-    }
-
-
 }

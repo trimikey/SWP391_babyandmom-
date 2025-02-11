@@ -10,6 +10,7 @@ public enum ErrorCode {
     EMAIL_NOT_FOUND(1002,"Email not found, please register account.",HttpStatus.NOT_FOUND),
     EMAIL_PASSWORD_NOT_CORRECT(1003, "Email or password is not correct", HttpStatus.BAD_REQUEST),
     TOKEN_INVALID(1004, "Invalid token", HttpStatus.BAD_REQUEST),
+    INVALID_CREDENTIALS(1005,"Invalid email or password", HttpStatus.UNAUTHORIZED);
 
     ;
     @Getter

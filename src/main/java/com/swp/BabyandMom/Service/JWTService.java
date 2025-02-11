@@ -20,45 +20,38 @@ import java.util.function.Function;
 
 @Component
 public class JWTService {
-    private static final String SECRET = "CRAZY@IWASCRAZYONCE@THEYPUTMEINARUBBERROOM@ARUBBERROOMWITHRATS@ANDRATSMAKEMECRAZY!@$";
-    private final long EXPIRATION = 1 * 24 * 60 * 60 * 1000;
-    private final long EXPIRATION_REFRESHTOKEN = 7 * 24 * 60 * 60 * 1000;
+    private static final String SECRET = "1vmQU96Qje9RCP24GdxuQJwOavCmQrDcElEQwYo5nFC/emiX8KjSCsn7C4IJQWQz";
+    private final long EXPIRATION = 1 * 24 * 60 * 60 * 1000; // Token expiration time (1 day)
+    private final long EXPIRATION_REFRESHTOKEN = 7 * 24 * 60 * 60 * 1000; // Refresh token expiration time (7 days)
+
+    // Create the access token
     public String generateToken(String email) {
-        Date now = new Date(); // get current time
+        Date now = new Date(); // Current time
         Date expirationDate = new Date(now.getTime() + EXPIRATION);
 
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(now)
                 .setExpiration(expirationDate)
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
-        return token;
     }
 
+    // Create the refresh token
     public String generateRefreshToken(String email) {
-        Date now = new Date(); // get current time
+        Date now = new Date(); // Current time
         Date expirationDate = new Date(now.getTime() + EXPIRATION_REFRESHTOKEN);
 
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(now)
                 .setExpiration(expirationDate)
-                .signWith(SignatureAlgorithm.HS256, SECRET)
+                .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
-        return token;
     }
 
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
-    }
-
-    public String extractSubject(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
@@ -75,7 +68,7 @@ public class JWTService {
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
             Instant expiredOn = e.getClaims().getExpiration().toInstant();
             throw new TokenExpiredException("Token has expired", expiredOn);
-        }  catch (JwtException e) {
+        } catch (JwtException e) {
             throw new InvalidToken("Invalid token");
         } catch (Exception e) {
             throw new InvalidToken("Error parsing token: " + e.getMessage());
@@ -83,20 +76,28 @@ public class JWTService {
     }
 
     private Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before((new Date()));
+        return extractExpiration(token).before(new Date());
     }
 
-    public Boolean validateToken(String token, User userDetails){
-        final String userName= extractEmail(token);
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    public Boolean validateToken(String token, User userDetails) {
+        final String userName = extractEmail(token);
         return (userName.equals(userDetails.getEmail()) && !isTokenExpired(token));
     }
-
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static Map<String, Object> getPayload(String token) throws IOException {
-        DecodedJWT decodedJWT = JWT.decode(token);
-        String payload = new String(java.util.Base64.getUrlDecoder().decode(decodedJWT.getPayload()));
-        return objectMapper.readValue(payload, Map.class);
+        try {
+            DecodedJWT decodedJWT = JWT.decode(token);
+            String payload = new String(java.util.Base64.getUrlDecoder().decode(decodedJWT.getPayload()));
+            return objectMapper.readValue(payload, Map.class);
+        } catch (IOException e) {
+            throw new InvalidToken("Error decoding payload: " + e.getMessage());
+        }
     }
+
 }

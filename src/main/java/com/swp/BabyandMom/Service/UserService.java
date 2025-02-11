@@ -134,4 +134,18 @@ public class UserService implements UserDetailsService {
     }
 
 
+    // logic for register
+    public User register (User user) {
+        //xử lý logic
+            // kiểm tra user đã tồn tại hay chưa
+        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+        if (existingUser.isPresent()) {
+            throw new RuntimeException("User already exists cause email is available!");
+        }
+        //lưu xuống databse
+        User newUser = userRepository.save(user);
+        return newUser;
+    }
+
+
 }

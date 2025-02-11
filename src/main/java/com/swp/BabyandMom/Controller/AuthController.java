@@ -6,16 +6,22 @@ import com.swp.BabyandMom.DTO.RegisterRequestDTO;
 import com.swp.BabyandMom.DTO.RegisterResponseDTO;
 import com.swp.BabyandMom.Entity.User;
 import com.swp.BabyandMom.Service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.POST, RequestMethod.OPTIONS})
 @RestController
 @RequestMapping("/api")
 @CrossOrigin("*")
+
 public class AuthController {
-    @Autowired
-    private UserService userService;
+
+    private final UserService userService;
+
+    public AuthController(UserService userService) {
+        this.userService = userService;
+    }
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
         return userService.checkLogin(loginRequestDTO);

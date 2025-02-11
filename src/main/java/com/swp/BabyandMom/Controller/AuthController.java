@@ -2,6 +2,8 @@ package com.swp.BabyandMom.Controller;
 
 import com.swp.BabyandMom.DTO.LoginRequestDTO;
 import com.swp.BabyandMom.DTO.LoginResponseDTO;
+import com.swp.BabyandMom.DTO.RegisterRequestDTO;
+import com.swp.BabyandMom.DTO.RegisterResponseDTO;
 import com.swp.BabyandMom.Entity.User;
 import com.swp.BabyandMom.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api")
 @CrossOrigin("*")
 public class AuthController {
     @Autowired
@@ -20,8 +22,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public User register(@RequestBody User user){
-        return userService.register(user);
+    public ResponseEntity<RegisterResponseDTO> register(@RequestBody RegisterRequestDTO registerRequestDTO) {
+        return userService.checkRegister(registerRequestDTO);
     }
 
 

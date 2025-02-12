@@ -129,6 +129,8 @@ public class User implements UserDetails {
     @Transient
     private String refreshToken;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private RoleType role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

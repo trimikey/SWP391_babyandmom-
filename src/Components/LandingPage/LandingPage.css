@@ -1,0 +1,219 @@
+/* --- Tổng thể trang web mở rộng full width --- */
+.landing-page {
+    max-width: 1400px;
+    margin: auto;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* --- Navigation Bar --- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 15px 40px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff4081;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links li {
+    display: inline;
+}
+
+.nav-links a {
+    text-decoration: none;
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+}
+
+.nav-links a:hover {
+    color: #ff4081;
+}
+
+/* --- Login & Register Buttons --- */
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.primary-btn, .secondary-btn {
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.primary-btn {
+    background: #ff4081;
+    color: white;
+}
+
+.primary-btn:hover {
+    background: #e91e63;
+}
+
+.secondary-btn {
+    background: transparent;
+    border: 2px solid #ff4081;
+    color: #ff4081;
+}
+
+.secondary-btn:hover {
+    background: #ff4081;
+    color: white;
+}
+
+/* --- Hero Section --- */
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 80px 40px;
+    background: linear-gradient(to right, #ffdde1, #ee9ca7);
+    border-radius: 10px;
+}
+
+.hero-content {
+    width: 50%;
+}
+
+.hero-image {
+    width: 40%;
+    border-radius: 15px;
+}
+
+/* --- About & Blog Sections --- */
+.about, .blog {
+    padding: 60px 40px;
+}
+
+.about-content, .blog-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.image-placeholder {
+    width: 45%;
+    height: 250px;
+    background: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #555;
+    border-radius: 10px;
+}
+.cta {
+    text-align: center; /* Căn giữa nội dung */
+    padding: 50px 20px;
+   
+    color: white;
+    border-radius: 10px;
+    margin: 40px auto;
+}
+/* --- Footer --- */
+.footer {
+    background: #ff758c; /* Harmonious pink shade */
+    color: white;
+    padding: 40px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    border-radius: 15px;
+}
+
+.footer-content {
+    max-width: 400px;
+}
+
+.footer-content h3 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.footer p {
+    font-size: 14px;
+    color: #fff;
+    line-height: 1.6;
+}
+
+/* Footer Links */
+.footer-links {
+    display: flex;
+    flex-direction: column;
+    color: black;
+}
+.footer-content {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: black;
+
+}
+.footer-content p {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    margin-bottom: 10px;
+    color: black;
+
+}
+.footer-links h4 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+
+}
+
+.footer-links ul li {
+    margin-bottom: 10px;
+}
+
+.footer-links ul li a {
+    text-decoration: none;
+    font-size: 16px;
+    color: rgb(51, 14, 14);
+    transition: color 0.3s  ease;
+}
+
+.footer-links ul li a:hover {
+    color: #ffdde1;
+}
+
+/* Social Media */
+.social-media {
+    text-align: center;
+    color: black;
+}
+
+.social-media h4 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.social-media p {
+    font-size: 16px;
+    color: white;
+}   

@@ -23,6 +23,6 @@ Buy & Sell Marketplace: A reliable and transparent marketplace for buying and se
 We thank each contributor for their hard work and dedication to making this project a success!
 
 ## Frontend Repository  
-For the frontend code of the Koi Farm Shop platform, please visit the [Frontend GitHub Repository](https://github.com/pq-minh/KoiFarmShopFE).
+For the frontend code of the Koi Farm Shop platform, please visit the [Frontend GitHub Repository](https://github.com/trimikey/SWP391_babyandmom_FE).
 
 This repository contains all the client-side code, including the user interface, components, and interactions with the backend.

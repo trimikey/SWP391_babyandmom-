@@ -95,18 +95,19 @@ public class UserService implements UserDetailsService {
             // Kiểm tra email đã tồn tại chưa
             if (userRepository.existsByEmail(registerRequestDTO.getEmail())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new RegisterResponseDTO(null, null, null, null, "Email đã được sử dụng!"));
+                        .body(new RegisterResponseDTO((Long) null, (String) null, (String) null, (String) null, (String) null, "Email đã được sử dụng!"));
             }
 
             // Kiểm tra username đã tồn tại chưa
             if (userRepository.existsByUserName(registerRequestDTO.getUserName())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new RegisterResponseDTO(null, null, null, null, "Username đã tồn tại!"));
+                        .body(new RegisterResponseDTO((Long) null, (String) null, (String) null, (String) null, (String) null, "Username đã tồn tại!"));
             }
 
             User newUser = new User();
             newUser.setFullName(registerRequestDTO.getName());
             newUser.setUserName(registerRequestDTO.getUserName());
+            newUser.setPhoneNumber(registerRequestDTO.getPhoneNumber());
             newUser.setEmail(registerRequestDTO.getEmail());
             newUser.setPassword(registerRequestDTO.getPassword());
 
@@ -118,6 +119,7 @@ public class UserService implements UserDetailsService {
             RegisterResponseDTO responseDTO = new RegisterResponseDTO(
                     savedUser.getId(),
                     savedUser.getFullName(),
+                    savedUser.getPassword(),
                     savedUser.getUserName(),
                     savedUser.getEmail(),
                     "Registered successfully"
@@ -127,7 +129,7 @@ public class UserService implements UserDetailsService {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new RegisterResponseDTO(null, null, null, null, "Lỗi server: " + e.getMessage()));
+                    .body(new RegisterResponseDTO((Long) null, null, null, null,null, "Lỗi server: " + e.getMessage()));
         }
     }
 

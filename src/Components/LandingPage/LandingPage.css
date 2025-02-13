@@ -1,6 +1,6 @@
 /* --- Tổng thể trang web mở rộng full width --- */
 .landing-page {
-    max-width: 1400px;
+    max-width: 1300px;
     margin: auto;
     font-family: Arial, Helvetica, sans-serif;
 }
@@ -125,13 +125,15 @@
     text-align: center; /* Căn giữa nội dung */
     padding: 50px 20px;
    
-    color: white;
+    color: rgb(21, 5, 5);
     border-radius: 10px;
     margin: 40px auto;
 }
 /* --- Footer --- */
+/* --- Footer --- */
+
 .footer {
-    background: #ff758c; /* Harmonious pink shade */
+    background: #f8bbd0 !important; /* Màu hồng nhẹ, dùng !important để ưu tiên */
     color: white;
     padding: 40px 60px;
     display: flex;
@@ -141,50 +143,42 @@
     border-radius: 15px;
 }
 
+
+/* Tiêu đề và nội dung footer */
 .footer-content {
     max-width: 400px;
+    color: #dc50be; /* Màu hồng tím đậm cho chữ */
 }
 
-.footer-content h3 {
+.footer-content h3 {    
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 10px;
+    color: #880e4f; /* Hồng đậm */
 }
 
 .footer p {
     font-size: 14px;
-    color: #fff;
     line-height: 1.6;
+    color: #5a1646; /* Hồng tím nhạt */
 }
 
 /* Footer Links */
 .footer-links {
     display: flex;
     flex-direction: column;
-    color: black;
 }
-.footer-content {
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: black;
 
-}
-.footer-content p {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    margin-bottom: 10px;
-    color: black;
-
-}
 .footer-links h4 {
     font-size: 18px;
     margin-bottom: 15px;
+    color:#880e4f; /* Tím nhẹ */
 }
 
 .footer-links ul {
     list-style: none;
     padding: 0;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-
+    color: black;
 }
 
 .footer-links ul li {
@@ -193,14 +187,32 @@
 
 .footer-links ul li a {
     text-decoration: none;
-    font-size: 16px;
-    color: rgb(51, 14, 14);
-    transition: color 0.3s  ease;
+    font-size: 16px;    
+    color: #c62f85; /* Hồng tím trầm */
+     transition: color 0.3s ease;
 }
 
 .footer-links ul li a:hover {
-    color: #ffdde1;
+    color: #3c751f; /* Hồng rực rỡ hơn khi hover */
 }
+
+/* Social Media */
+.social-media {
+    text-align: center;
+    color: #4a1c36;
+}
+
+.social-media h4 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #880e4f;
+}
+
+.social-media p {
+    font-size: 16px;
+    color: #6a1b9a;
+}
+
 
 /* Social Media */
 .social-media {

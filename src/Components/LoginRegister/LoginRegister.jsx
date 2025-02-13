@@ -9,6 +9,7 @@ const LoginRegister = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    
     const registerLink = () => setAction('active');
     const loginLink = () => setAction('');
     const togglePassword = () => setShowPassword(!showPassword);
@@ -58,15 +59,14 @@ const LoginRegister = () => {
                     </div>
 
                     <button type="submit">Login</button>
-                        
-                    <div className="register-link">
-                    </div>
+                    
+                    <button type="button" onClick={registerLink} className="switch-btn">Register</button>
                 </form>
             </div>
 
             {/* Register Form */}
             <div className="form-box register">
-                <form action="">
+                <form>
                     <h1>Register</h1>
                     <div className="input-box">
                         <input type="text" placeholder="Username" required />

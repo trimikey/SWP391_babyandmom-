@@ -31,6 +31,7 @@ public class User implements UserDetails {
     private String password;
 
     private String fullName;
+
     private String phoneNumber;
 
     @Column(nullable = false)
@@ -68,11 +69,11 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public String getFullName() {
+    public String getName() {
         return fullName;
     }
 
-    public void setFullName(String fullName) {
+    public void setName(String fullName) {
         this.fullName = fullName;
     }
 

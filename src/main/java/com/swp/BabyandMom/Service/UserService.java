@@ -1,15 +1,15 @@
 package com.swp.BabyandMom.Service;
 
-import com.swp.BabyandMom.DTO.LoginRequestDTO;
-import com.swp.BabyandMom.DTO.LoginResponseDTO;
-import com.swp.BabyandMom.DTO.RegisterRequestDTO;
-import com.swp.BabyandMom.DTO.RegisterResponseDTO;
+import com.swp.BabyandMom.DTO.*;
 import com.swp.BabyandMom.Entity.Enum.RoleType;
 import com.swp.BabyandMom.Entity.Enum.UserStatusEnum;
 import com.swp.BabyandMom.Entity.User;
 import com.swp.BabyandMom.ExceptionHandler.AuthAppException;
 import com.swp.BabyandMom.ExceptionHandler.ErrorCode;
+import com.swp.BabyandMom.ExceptionHandler.NotLoginException;
 import com.swp.BabyandMom.Repository.UserRepository;
+import com.swp.BabyandMom.Utils.UpdateUtils;
+import com.swp.BabyandMom.Utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,8 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private UserUtils userUtils;
     @Autowired
     private JWTService jwtService;
 
@@ -133,5 +134,39 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    public ResponseEntity<GetProfileResponseDTO> getProfile() {
+        User account = userUtils.getCurrentAccount();
+
+        GetProfileResponseDTO getProfileResponse = new GetProfileResponseDTO(
+                account.getName(),
+                account.getEmail(),
+                account.getPhone(),
+                account.getRole()
+        );
+        return ResponseEntity.ok(getProfileResponse);
+    }
+
+    public UpdateProfileResponseDTO update(UpdateProfileRequestDTO updateRequestDTO) throws Exception {
+        //get current user
+        User user = null;
+        try {
+            user = userUtils.getCurrentAccount();
+        } catch (Exception ex) {
+            throw new NotLoginException("Not Login");
+        }
+
+        user = UpdateUtils.updateAccount(updateRequestDTO, user);
+
+        try {
+            userRepository.save(user);
+            return new UpdateProfileResponseDTO(
+                    user.getName(),
+                    user.getEmail(),
+                    user.getPhoneNumber(),
+                    user.getPassword());
+        } catch (Exception ex) {
+            throw new Exception("Can not update");
+        }
+    }
 
 }

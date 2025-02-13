@@ -163,4 +163,9 @@ public class User implements UserDetails {
     public String getUserName() {
         return userName;
     }
+
+    public String getPhone() {
+        return phoneNumber;
+    }
+
 }

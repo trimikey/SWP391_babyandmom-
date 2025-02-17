@@ -1,0 +1,24 @@
+package com.swp.BabyandMom.DTO;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+@Getter
+@Setter
+@Data
+public class PregnancyProfileRequestDTO {
+
+    @NotNull(message = "Due date cannot be left blank")
+    private LocalDateTime dueDate;
+
+    @NotNull(message = "Current week cannot be left blank")
+    private Integer currentWeek;
+
+    @NotNull(message = "Last Period cannot be left blank")
+    private String lastPeriod;
+
+    @NotNull(message = "Height cannot be left blank")
+    private Float height;
+}

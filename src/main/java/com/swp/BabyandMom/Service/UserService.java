@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,9 @@ public class UserService implements UserDetailsService {
     private UserUtils userUtils;
     @Autowired
     private JWTService jwtService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public User getAccountByEmail(String email) {
         Optional<User> account = userRepository.findByEmail(email);
@@ -134,6 +138,7 @@ public class UserService implements UserDetailsService {
         }
     }
 
+
     public ResponseEntity<GetProfileResponseDTO> getProfile() {
         User account = userUtils.getCurrentAccount();
 
@@ -147,7 +152,7 @@ public class UserService implements UserDetailsService {
     }
 
     public UpdateProfileResponseDTO update(UpdateProfileRequestDTO updateRequestDTO) throws Exception {
-        //get current user
+
         User user = null;
         try {
             user = userUtils.getCurrentAccount();

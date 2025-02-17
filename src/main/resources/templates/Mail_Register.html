@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'/>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+        }
+        .header {
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<p class="header">Xin chào, <span th:text="${name}">Tên Người Dùng</span></p>
+<p>Chúng tôi đã nhận được yêu cầu đăng ký tài khoản từ bạn tại hệ thống Baby and Mom.</p>
+<p>Vui lòng xác thực địa chỉ email của bạn bằng cách nhấn vào liên kết dưới đây:</p>
+<p><a th:href="${verificationUrl}" target="_blank">Xác thực tài khoản của bạn tại đây</a></p>
+
+<p>Lưu ý: Liên kết xác thực này sẽ hết hạn sau 24 giờ.</p>
+
+<p>Trân trọng,</p>
+<p>Đội ngũ Baby and Mom</p>
+<p>Đây là email tự động, vui lòng không trả lời.</p>
+</body>
+</html>

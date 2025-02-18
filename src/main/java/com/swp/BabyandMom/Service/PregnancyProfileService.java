@@ -48,15 +48,14 @@ public class PregnancyProfileService {
     public PregnancyProfileResponseDTO updateProfile(Long id, PregnancyProfileRequestDTO request) {
         Pregnancy_Profile profile = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Profile not found"));
-        if (!profile.getUser().equals(userUtils.getCurrentAccount())) {
-            throw new RuntimeException("Unauthorized");
-        }
+
         profile.setDueDate(request.getDueDate());
         profile.setCurrentWeek(request.getCurrentWeek());
         profile.setLastPeriod(request.getLastPeriod());
         profile.setHeight(request.getHeight());
         profile.setUpdatedAt(LocalDateTime.now());
         repository.save(profile);
+
         return new PregnancyProfileResponseDTO(
                 profile.getId(), profile.getDueDate(),
                 profile.getCurrentWeek(), profile.getLastPeriod(),
@@ -66,9 +65,6 @@ public class PregnancyProfileService {
     public void deleteProfile(Long id) {
         Pregnancy_Profile profile = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Profile not found"));
-        if (!profile.getUser().equals(userUtils.getCurrentAccount())) {
-            throw new RuntimeException("Unauthorized");
-        }
         repository.delete(profile);
     }
 }

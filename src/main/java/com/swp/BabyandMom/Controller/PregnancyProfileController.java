@@ -31,8 +31,9 @@ public class PregnancyProfileController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProfile(@PathVariable Long id) {
+    public ResponseEntity<String> deleteProfile(@PathVariable Long id) {
         service.deleteProfile(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Delete successfully");
     }
+
 }

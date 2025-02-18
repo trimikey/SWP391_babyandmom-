@@ -14,10 +14,9 @@ public class Growth_Record {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Field name phải khớp với mappedBy trong Pregnancy_Profile
     @ManyToOne
     @JoinColumn(name = "profile_id", nullable = false)
-    private Pregnancy_Profile pregnancy;  // Tên field này phải khớp với mappedBy bên trên
+    private Pregnancy_Profile pregnancy;
 
     @Column(nullable = false)
     private Integer pregnancyWeek;

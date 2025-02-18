@@ -88,6 +88,19 @@
 			<artifactId>jaxb-runtime</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf-spring5</artifactId>
+			<version>3.0.12.RELEASE</version>
+		</dependency>
+		<dependency>
 			<groupId>com.auth0</groupId>
 			<artifactId>java-jwt</artifactId>
 			<version>4.0.0</version>
@@ -96,7 +109,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>com.swp</groupId>
+			<artifactId>BabyandMom</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 
 
 	</dependencies>

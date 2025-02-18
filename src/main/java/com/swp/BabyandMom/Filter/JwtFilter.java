@@ -1,7 +1,9 @@
 package com.swp.BabyandMom.Filter;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swp.BabyandMom.Entity.User;
+import com.swp.BabyandMom.ExceptionHandler.InvalidToken;
 import com.swp.BabyandMom.Service.JWTService;
 import com.swp.BabyandMom.Service.UserService;
 import jakarta.servlet.FilterChain;
@@ -33,14 +35,11 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String uri = request.getRequestURI();
-        if (uri.contains("/api/login") || uri.contains("/api/register")) {
-            filterChain.doFilter(request,response);
-
+        if (uri.contains("/api/auth/login") || uri.contains("/api/auth/register")) {
+            // Cho phép yêu cầu không cần JWT (login, register)
+            filterChain.doFilter(request, response);
             return;
         }
-        System.out.println("Request URI: " + uri);
-
-
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -49,7 +48,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         try {
-            String token = authHeader.substring(7);
+            String token = authHeader.substring(7); // Lấy token sau "Bearer "
             String email = jwtService.extractEmail(token);
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -63,12 +62,27 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
             filterChain.doFilter(request, response);
+        } catch (TokenExpiredException e) {
+            response.setContentType("application/json");
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Expired token");
+            error.put("message", e.getMessage());
+
+            new ObjectMapper().writeValue(response.getOutputStream(), error);
+        } catch (InvalidToken e) {
+            response.setContentType("application/json");
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Invalid token");
+            error.put("message", e.getMessage());
+
+            new ObjectMapper().writeValue(response.getOutputStream(), error);
         } catch (Exception e) {
             response.setContentType("application/json");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-
             Map<String, String> error = new HashMap<>();
-            error.put("error", "Invalid or expired token");
+            error.put("error", "Unauthorized");
             error.put("message", e.getMessage());
 
             new ObjectMapper().writeValue(response.getOutputStream(), error);

@@ -35,8 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String uri = request.getRequestURI();
-        if (uri.contains("/api/auth/login") || uri.contains("/api/auth/register")) {
-            // Cho phép yêu cầu không cần JWT (login, register)
+        if (uri.contains("/api/login") || uri.contains("/api/register")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -88,4 +87,5 @@ public class JwtFilter extends OncePerRequestFilter {
             new ObjectMapper().writeValue(response.getOutputStream(), error);
         }
     }
+
 }

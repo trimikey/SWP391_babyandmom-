@@ -173,4 +173,7 @@ public class User implements UserDetails {
         return phoneNumber;
     }
 
+    public Object getRoles() {
+        return role;
+    }
 }

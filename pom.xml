@@ -109,11 +109,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.swp</groupId>
 			<artifactId>BabyandMom</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+		</dependency> -->
 
 
 	</dependencies>

@@ -4,10 +4,12 @@ import com.swp.BabyandMom.DTO.*;
 import com.swp.BabyandMom.Entity.Enum.RoleType;
 import com.swp.BabyandMom.Entity.Enum.UserStatusEnum;
 import com.swp.BabyandMom.Entity.User;
+import com.swp.BabyandMom.Entity.Pregnancy_Profile;
 import com.swp.BabyandMom.ExceptionHandler.AuthAppException;
 import com.swp.BabyandMom.ExceptionHandler.ErrorCode;
 import com.swp.BabyandMom.ExceptionHandler.NotLoginException;
 import com.swp.BabyandMom.Repository.UserRepository;
+import com.swp.BabyandMom.Repository.PregnancyRepository;
 import com.swp.BabyandMom.Utils.UpdateUtils;
 import com.swp.BabyandMom.Utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -33,6 +36,8 @@ public class UserService implements UserDetailsService {
     private UserUtils userUtils;
     @Autowired
     private JWTService jwtService;
+    @Autowired
+    private PregnancyRepository pregnancyRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -109,18 +114,30 @@ public class UserService implements UserDetailsService {
                         .body(new RegisterResponseDTO((Long) null, (String) null, (String) null, (String) null, (String) null, "Username đã tồn tại!"));
             }
 
+            // Tạo user mới
             User newUser = new User();
             newUser.setFullName(registerRequestDTO.getName());
             newUser.setUserName(registerRequestDTO.getUserName());
             newUser.setPhoneNumber(registerRequestDTO.getPhoneNumber());
             newUser.setEmail(registerRequestDTO.getEmail());
-            // Mã hóa password trước khi lưu
             newUser.setPassword(passwordEncoder.encode(registerRequestDTO.getPassword()));
-
             newUser.setRole(RoleType.MEMBER);
             newUser.setStatus(UserStatusEnum.VERIFIED);
 
             User savedUser = userRepository.save(newUser);
+
+            // Tạo pregnancy profile mới
+            Pregnancy_Profile profile = new Pregnancy_Profile();
+            profile.setUser(savedUser);
+            profile.setDueDate(registerRequestDTO.getDueDate());
+            profile.setCurrentWeek(registerRequestDTO.getCurrentWeek());
+            profile.setLastPeriod(registerRequestDTO.getLastPeriod());
+            profile.setHeight(registerRequestDTO.getHeight());
+            profile.setCreatedAt(LocalDateTime.now());
+            profile.setIsActive(true);
+            profile.setIsNormal(true);
+
+            pregnancyRepository.save(profile);
 
             RegisterResponseDTO responseDTO = new RegisterResponseDTO(
                     savedUser.getId(),
@@ -133,9 +150,9 @@ public class UserService implements UserDetailsService {
 
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Registration error: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new RegisterResponseDTO((Long) null, null, null, null,null, "Lỗi server: " + e.getMessage()));
+                    .body(new RegisterResponseDTO((Long) null, null, null, null, null, "Lỗi server: " + e.getMessage()));
         }
     }
 

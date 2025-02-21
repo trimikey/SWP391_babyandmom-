@@ -5,11 +5,13 @@ import com.swp.BabyandMom.DTO.LoginResponseDTO;
 import com.swp.BabyandMom.DTO.RegisterRequestDTO;
 import com.swp.BabyandMom.DTO.RegisterResponseDTO;
 import com.swp.BabyandMom.Service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+@SecurityRequirement(name = "api")
 @CrossOrigin("*")
 
 public class AuthController {

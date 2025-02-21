@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class PregnancyProfileResponseDTO {
     private Long id;
+    private String babyName;
+    private String babyGender;
     private LocalDateTime dueDate;
     private Integer currentWeek;
     private String lastPeriod;

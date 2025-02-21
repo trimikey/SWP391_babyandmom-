@@ -22,10 +22,10 @@ public class Growth_Record {
     private Integer pregnancyWeek;
 
     @Column(nullable = false)
-    private Float babyWeight;
+    private Float PregnancyWeight;
 
     @Column(nullable = false)
-    private Float babyLength;
+    private Float PregnancyHeight;
 
     @Column(columnDefinition = "TEXT")
     private String notes;

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/faqs")
+@RequestMapping("/api/faqs")
 public class FAQController {
     private final FAQService faqService;
 
@@ -28,16 +28,19 @@ public class FAQController {
         return ResponseEntity.ok(faqService.getFAQById(id));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public ResponseEntity<FAQResponseDTO> createFAQ(@RequestBody FAQRequestDTO request) {
         return ResponseEntity.ok(faqService.createFAQ(request));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<FAQResponseDTO> updateFAQ(@PathVariable Long id, @RequestBody FAQRequestDTO request) {
         return ResponseEntity.ok(faqService.updateFAQ(id, request));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteFAQ(@PathVariable Long id) {
         faqService.deleteFAQ(id);

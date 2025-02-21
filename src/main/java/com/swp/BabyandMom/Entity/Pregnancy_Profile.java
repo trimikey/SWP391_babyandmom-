@@ -1,7 +1,7 @@
 package com.swp.BabyandMom.Entity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,6 +17,12 @@ public class Pregnancy_Profile {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Column(nullable = false)
+    private String babyName;
+
+    @Column(nullable = false)
+    private String babyGender;
 
     @Column(nullable = false)
     private LocalDateTime dueDate;

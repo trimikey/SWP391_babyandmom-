@@ -23,7 +23,7 @@ public class PregnancyProfileService {
         User currentUser = userUtils.getCurrentAccount();
         return repository.findByUser(currentUser).stream()
                 .map(profile -> new PregnancyProfileResponseDTO(
-                        profile.getId(), profile.getDueDate(),
+                        profile.getId(),profile.getBabyName(),profile.getBabyGender(), profile.getDueDate(),
                         profile.getCurrentWeek(), profile.getLastPeriod(),
                         profile.getHeight()))
                 .collect(Collectors.toList());
@@ -33,6 +33,8 @@ public class PregnancyProfileService {
         User currentUser = userUtils.getCurrentAccount();
         Pregnancy_Profile profile = new Pregnancy_Profile();
         profile.setUser(currentUser);
+        profile.setBabyName(request.getBabyName());
+        profile.setBabyGender(request.getBabyGender());
         profile.setDueDate(request.getDueDate());
         profile.setCurrentWeek(request.getCurrentWeek());
         profile.setLastPeriod(request.getLastPeriod());
@@ -40,7 +42,7 @@ public class PregnancyProfileService {
         profile.setCreatedAt(LocalDateTime.now());
         repository.save(profile);
         return new PregnancyProfileResponseDTO(
-                profile.getId(), profile.getDueDate(),
+                profile.getId(), profile.getBabyName(),profile.getBabyGender(),profile.getDueDate(),
                 profile.getCurrentWeek(), profile.getLastPeriod(),
                 profile.getHeight());
     }
@@ -48,7 +50,8 @@ public class PregnancyProfileService {
     public PregnancyProfileResponseDTO updateProfile(Long id, PregnancyProfileRequestDTO request) {
         Pregnancy_Profile profile = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Profile not found"));
-
+        profile.setBabyName(request.getBabyName());
+        profile.setBabyGender(request.getBabyGender());
         profile.setDueDate(request.getDueDate());
         profile.setCurrentWeek(request.getCurrentWeek());
         profile.setLastPeriod(request.getLastPeriod());
@@ -57,7 +60,7 @@ public class PregnancyProfileService {
         repository.save(profile);
 
         return new PregnancyProfileResponseDTO(
-                profile.getId(), profile.getDueDate(),
+                profile.getId(), profile.getBabyName(),profile.getBabyGender(), profile.getDueDate(),
                 profile.getCurrentWeek(), profile.getLastPeriod(),
                 profile.getHeight());
     }

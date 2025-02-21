@@ -68,7 +68,7 @@ public class UserService implements UserDetailsService {
                 );
             }
 
-            if (!user.getPassword().equals(loginRequestDTO.getPassword())) {
+            if (!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
                 logger.warn("Login failed: Incorrect password - {}", loginRequestDTO.getEmail());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                         new LoginResponseDTO("Incorrect email or password", "Login failed", null, null)
@@ -114,7 +114,8 @@ public class UserService implements UserDetailsService {
             newUser.setUserName(registerRequestDTO.getUserName());
             newUser.setPhoneNumber(registerRequestDTO.getPhoneNumber());
             newUser.setEmail(registerRequestDTO.getEmail());
-            newUser.setPassword(registerRequestDTO.getPassword());
+            // Mã hóa password trước khi lưu
+            newUser.setPassword(passwordEncoder.encode(registerRequestDTO.getPassword()));
 
             newUser.setRole(RoleType.MEMBER);
             newUser.setStatus(UserStatusEnum.VERIFIED);
@@ -171,6 +172,52 @@ public class UserService implements UserDetailsService {
                     user.getPassword());
         } catch (Exception ex) {
             throw new Exception("Can not update");
+        }
+    }
+
+    public ResponseEntity<ChangePasswordResponseDTO> changePassword(ChangePasswordRequestDTO request) {
+        logger.info("Processing change password request");
+        
+        try {
+            User currentUser = userUtils.getCurrentAccount();
+            if (currentUser == null) {
+                logger.warn("Change password failed: User not logged in");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ChangePasswordResponseDTO("User not logged in", "Failed"));
+            }
+
+            // Verify old password using BCrypt
+            if (!passwordEncoder.matches(request.getOldPassword(), currentUser.getPassword())) {
+                logger.warn("Change password failed: Incorrect old password");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ChangePasswordResponseDTO("Incorrect old password", "Failed"));
+            }
+
+            // Validate new password
+            if (request.getNewPassword() == null || request.getNewPassword().trim().isEmpty()) {
+                logger.warn("Change password failed: New password cannot be empty");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ChangePasswordResponseDTO("New password cannot be empty", "Failed"));
+            }
+
+            // Validate confirm password
+            if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+                logger.warn("Change password failed: Passwords do not match");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ChangePasswordResponseDTO("New password and confirm password do not match", "Failed"));
+            }
+
+            // Update password with encryption
+            currentUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepository.save(currentUser);
+
+            logger.info("Password changed successfully for user: {}", currentUser.getEmail());
+            return ResponseEntity.ok(new ChangePasswordResponseDTO("Password changed successfully", "Success"));
+
+        } catch (Exception e) {
+            logger.error("Unexpected error during password change: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ChangePasswordResponseDTO("An unexpected error occurred", "Failed"));
         }
     }
 

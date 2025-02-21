@@ -10,6 +10,12 @@ import java.time.LocalDateTime;
 @Data
 public class PregnancyProfileRequestDTO {
 
+    @NotNull(message = "Baby name cannot be left blank")
+    private String babyName;
+
+    @NotNull(message = "Baby gender cannot be left blank")
+    private String babyGender;
+
     @NotNull(message = "Due date cannot be left blank")
     private LocalDateTime dueDate;
 

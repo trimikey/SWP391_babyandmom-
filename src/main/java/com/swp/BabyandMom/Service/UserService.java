@@ -4,10 +4,12 @@ import com.swp.BabyandMom.DTO.*;
 import com.swp.BabyandMom.Entity.Enum.RoleType;
 import com.swp.BabyandMom.Entity.Enum.UserStatusEnum;
 import com.swp.BabyandMom.Entity.User;
+import com.swp.BabyandMom.Entity.Pregnancy_Profile;
 import com.swp.BabyandMom.ExceptionHandler.AuthAppException;
 import com.swp.BabyandMom.ExceptionHandler.ErrorCode;
 import com.swp.BabyandMom.ExceptionHandler.NotLoginException;
 import com.swp.BabyandMom.Repository.UserRepository;
+import com.swp.BabyandMom.Repository.PregnancyRepository;
 import com.swp.BabyandMom.Utils.UpdateUtils;
 import com.swp.BabyandMom.Utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -33,6 +36,8 @@ public class UserService implements UserDetailsService {
     private UserUtils userUtils;
     @Autowired
     private JWTService jwtService;
+    @Autowired
+    private PregnancyRepository pregnancyRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -68,7 +73,7 @@ public class UserService implements UserDetailsService {
                 );
             }
 
-            if (!user.getPassword().equals(loginRequestDTO.getPassword())) {
+            if (!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
                 logger.warn("Login failed: Incorrect password - {}", loginRequestDTO.getEmail());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                         new LoginResponseDTO("Incorrect email or password", "Login failed", null, null)
@@ -109,17 +114,30 @@ public class UserService implements UserDetailsService {
                         .body(new RegisterResponseDTO((Long) null, (String) null, (String) null, (String) null, (String) null, "Username đã tồn tại!"));
             }
 
+            // Tạo user mới
             User newUser = new User();
             newUser.setFullName(registerRequestDTO.getName());
             newUser.setUserName(registerRequestDTO.getUserName());
             newUser.setPhoneNumber(registerRequestDTO.getPhoneNumber());
             newUser.setEmail(registerRequestDTO.getEmail());
-            newUser.setPassword(registerRequestDTO.getPassword());
-
+            newUser.setPassword(passwordEncoder.encode(registerRequestDTO.getPassword()));
             newUser.setRole(RoleType.MEMBER);
             newUser.setStatus(UserStatusEnum.VERIFIED);
 
             User savedUser = userRepository.save(newUser);
+
+            // Tạo pregnancy profile mới
+            Pregnancy_Profile profile = new Pregnancy_Profile();
+            profile.setUser(savedUser);
+            profile.setDueDate(registerRequestDTO.getDueDate());
+            profile.setCurrentWeek(registerRequestDTO.getCurrentWeek());
+            profile.setLastPeriod(registerRequestDTO.getLastPeriod());
+            profile.setHeight(registerRequestDTO.getHeight());
+            profile.setCreatedAt(LocalDateTime.now());
+            profile.setIsActive(true);
+            profile.setIsNormal(true);
+
+            pregnancyRepository.save(profile);
 
             RegisterResponseDTO responseDTO = new RegisterResponseDTO(
                     savedUser.getId(),
@@ -132,9 +150,9 @@ public class UserService implements UserDetailsService {
 
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Registration error: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new RegisterResponseDTO((Long) null, null, null, null,null, "Lỗi server: " + e.getMessage()));
+                    .body(new RegisterResponseDTO((Long) null, null, null, null, null, "Lỗi server: " + e.getMessage()));
         }
     }
 
@@ -171,6 +189,52 @@ public class UserService implements UserDetailsService {
                     user.getPassword());
         } catch (Exception ex) {
             throw new Exception("Can not update");
+        }
+    }
+
+    public ResponseEntity<ChangePasswordResponseDTO> changePassword(ChangePasswordRequestDTO request) {
+        logger.info("Processing change password request");
+        
+        try {
+            User currentUser = userUtils.getCurrentAccount();
+            if (currentUser == null) {
+                logger.warn("Change password failed: User not logged in");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ChangePasswordResponseDTO("User not logged in", "Failed"));
+            }
+
+            // Verify old password using BCrypt
+            if (!passwordEncoder.matches(request.getOldPassword(), currentUser.getPassword())) {
+                logger.warn("Change password failed: Incorrect old password");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ChangePasswordResponseDTO("Incorrect old password", "Failed"));
+            }
+
+            // Validate new password
+            if (request.getNewPassword() == null || request.getNewPassword().trim().isEmpty()) {
+                logger.warn("Change password failed: New password cannot be empty");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ChangePasswordResponseDTO("New password cannot be empty", "Failed"));
+            }
+
+            // Validate confirm password
+            if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+                logger.warn("Change password failed: Passwords do not match");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ChangePasswordResponseDTO("New password and confirm password do not match", "Failed"));
+            }
+
+            // Update password with encryption
+            currentUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepository.save(currentUser);
+
+            logger.info("Password changed successfully for user: {}", currentUser.getEmail());
+            return ResponseEntity.ok(new ChangePasswordResponseDTO("Password changed successfully", "Success"));
+
+        } catch (Exception e) {
+            logger.error("Unexpected error during password change: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ChangePasswordResponseDTO("An unexpected error occurred", "Failed"));
         }
     }
 

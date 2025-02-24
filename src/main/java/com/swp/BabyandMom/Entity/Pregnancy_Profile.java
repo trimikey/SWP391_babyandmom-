@@ -1,7 +1,7 @@
 package com.swp.BabyandMom.Entity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,12 +19,18 @@ public class Pregnancy_Profile {
     private User user;
 
     @Column(nullable = false)
+    private String babyName;
+
+    @Column(nullable = false)
+    private String babyGender;
+
+    @Column(nullable = false)
     private LocalDateTime dueDate;
 
     @Column(nullable = false)
     private Integer currentWeek;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String lastPeriod;
 
     @Column(nullable = false)

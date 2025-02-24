@@ -126,18 +126,7 @@ public class UserService implements UserDetailsService {
 
             User savedUser = userRepository.save(newUser);
 
-            // Tạo pregnancy profile mới
-            Pregnancy_Profile profile = new Pregnancy_Profile();
-            profile.setUser(savedUser);
-            profile.setDueDate(registerRequestDTO.getDueDate());
-            profile.setCurrentWeek(registerRequestDTO.getCurrentWeek());
-            profile.setLastPeriod(registerRequestDTO.getLastPeriod());
-            profile.setHeight(registerRequestDTO.getHeight());
-            profile.setCreatedAt(LocalDateTime.now());
-            profile.setIsActive(true);
-            profile.setIsNormal(true);
 
-            pregnancyRepository.save(profile);
 
             RegisterResponseDTO responseDTO = new RegisterResponseDTO(
                     savedUser.getId(),

@@ -14,23 +14,6 @@ public class RegisterRequestDTO {
     private String email;
     private String password;
 
-    // Thêm thông tin thai kỳ
-    private LocalDateTime dueDate;
-    private Integer currentWeek;
-    private String lastPeriod;
-    private Float height;
 
-    public RegisterRequestDTO(String name, String userName, String password, String phoneNumber, String email,
-                            LocalDateTime dueDate, Integer currentWeek, String lastPeriod, Float height) {
-        this.email = email;
-        this.name = name;
-        this.password = password;
-        this.phoneNumber = phoneNumber;
-        this.userName = userName;
-        this.dueDate = dueDate;
-        this.currentWeek = currentWeek;
-        this.lastPeriod = lastPeriod;
-        this.height = height;
-    }
 }
 

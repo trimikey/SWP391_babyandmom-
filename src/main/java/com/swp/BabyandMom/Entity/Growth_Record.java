@@ -30,18 +30,16 @@ public class Growth_Record {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
+    @Column(nullable = false)
     private Float prePregnancyWeight;
-
+    @Column(nullable = false)
     private Float prePregnancyHeight;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    private Boolean isNormal = true;
-
     @Enumerated(EnumType.STRING)
-    private AlertStatus alertStatus = AlertStatus.NORMAL;
+    private AlertStatus alertStatus;
 
     @Column(columnDefinition = "TEXT")
     private String alertMessage;

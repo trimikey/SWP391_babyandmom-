@@ -30,7 +30,7 @@ public class Pregnancy_Profile {
     @Column(nullable = false)
     private Integer currentWeek;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String lastPeriod;
 
     @Column(nullable = false)

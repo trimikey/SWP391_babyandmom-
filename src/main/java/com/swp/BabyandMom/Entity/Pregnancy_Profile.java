@@ -34,6 +34,9 @@ public class Pregnancy_Profile {
     private String lastPeriod;
 
     @Column(nullable = false)
+    private Float weight;
+
+    @Column(nullable = false)
     private Float height;
 
     @Column(nullable = false)

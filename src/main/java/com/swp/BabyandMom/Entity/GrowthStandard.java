@@ -1,10 +1,10 @@
 package com.swp.BabyandMom.Entity;
+import com.swp.BabyandMom.Entity.Enum.BMIStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 @Entity
 @Data
 @NoArgsConstructor
@@ -31,6 +31,10 @@ public class GrowthStandard {
 
     @Column(nullable = false)
     private String gender;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private BMIStatus prePregnancyBMIStatus;
 
     @Column(columnDefinition = "TEXT")
     private String recommendations;

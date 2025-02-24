@@ -23,15 +23,22 @@ public class GrowthRecordService {
     private final PregnancyRepository pregnancyRepository;
     private final UserUtils userUtils;
 
-    public List<GrowthRecordResponseDTO> getGrowthRecordsByProfile(Long profileId) {
-        Pregnancy_Profile pregnancy = validateOwnership(profileId);
+    public List<GrowthRecordResponseDTO> getGrowthRecordsByCurrentUser() {
+        Pregnancy_Profile pregnancy = getPregnancyProfileOfCurrentUser();
         return repository.findByPregnancy(pregnancy).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
+    public GrowthRecordResponseDTO getGrowthRecordById(Long id) {
+        Growth_Record record = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Growth record not found"));
+        validateOwnership(record.getPregnancy().getId());
+        return convertToDTO(record);
+    }
+
     public GrowthRecordResponseDTO createGrowthRecord(GrowthRecordRequestDTO request) {
-        Pregnancy_Profile pregnancy = validateOwnership(request.getProfileId());
+        Pregnancy_Profile pregnancy = getPregnancyProfileOfCurrentUser();
 
         Growth_Record record = new Growth_Record();
         record.setPregnancy(pregnancy);
@@ -64,7 +71,13 @@ public class GrowthRecordService {
         return convertToDTO(record);
     }
 
-    private Pregnancy_Profile validateOwnership(Long profileId) {
+    public void deleteRecord(Long id) {
+        Growth_Record record = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Growth record not found"));
+        repository.delete(record);
+    }
+
+    private void validateOwnership(Long profileId) {
         User currentUser = userUtils.getCurrentAccount();
         Pregnancy_Profile pregnancy = pregnancyRepository.findById(profileId)
                 .orElseThrow(() -> new RuntimeException("Pregnancy profile not found"));
@@ -72,20 +85,14 @@ public class GrowthRecordService {
         if (!pregnancy.getUser().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You do not have permission to access this pregnancy profile");
         }
-        return pregnancy;
     }
 
-    public List<GrowthRecordResponseDTO> getGrowthRecordsByCurrentUser() {
+    private Pregnancy_Profile getPregnancyProfileOfCurrentUser() {
         User currentUser = userUtils.getCurrentAccount();
-        Pregnancy_Profile pregnancy = pregnancyRepository.findByUser(currentUser)
+        return pregnancyRepository.findByUser(currentUser)
                 .stream().findFirst()
                 .orElseThrow(() -> new RuntimeException("No pregnancy profile found for current user"));
-
-        return repository.findByPregnancy(pregnancy).stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
     }
-
 
     private GrowthRecordResponseDTO convertToDTO(Growth_Record record) {
         return new GrowthRecordResponseDTO(

@@ -25,6 +25,9 @@ public class JWTService {
     private final long EXPIRATION = 1 * 24 * 60 * 60 * 1000; // Token expiration time (1 day)
     private final long EXPIRATION_REFRESHTOKEN = 7 * 24 * 60 * 60 * 1000; // Refresh token expiration time (7 days)
 
+
+
+
     // Create the access token
     public String generateToken(String email) {
         Date now = new Date(); // Current time
@@ -37,6 +40,10 @@ public class JWTService {
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
     }
+
+
+
+
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", user.getRoles());
@@ -49,6 +56,8 @@ public class JWTService {
                 .signWith(SignatureAlgorithm.HS256, SECRET)
                 .compact();
     }
+
+
 
     // Create the refresh token
     public String generateRefreshToken(String email) {
@@ -88,6 +97,8 @@ public class JWTService {
         }
     }
 
+
+
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
@@ -95,6 +106,7 @@ public class JWTService {
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
+    
 
     public Boolean validateToken(String token, User userDetails) {
         final String userName = extractEmail(token);

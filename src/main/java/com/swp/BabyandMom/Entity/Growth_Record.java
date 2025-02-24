@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
-
 @Entity
 @Data
 @NoArgsConstructor
@@ -22,16 +21,17 @@ public class Growth_Record {
     private Integer pregnancyWeek;
 
     @Column(nullable = false)
-    private Float PregnancyWeight;
+    private Float pregnancyWeight;
 
     @Column(nullable = false)
-    private Float PregnancyHeight;
+    private Float pregnancyHeight;
 
     @Column(columnDefinition = "TEXT")
     private String notes;
 
     @Column(nullable = false)
     private Float prePregnancyWeight;
+
     @Column(nullable = false)
     private Float prePregnancyHeight;
 
@@ -41,9 +41,14 @@ public class Growth_Record {
     @Enumerated(EnumType.STRING)
     private AlertStatus alertStatus;
 
-    @Column(columnDefinition = "TEXT")
-    private String alertMessage;
-
     @OneToMany(mappedBy = "growthRecord")
     private List<Warning> warnings;
+
+    public float getPrePregnancyBMI() {
+        return prePregnancyWeight / (prePregnancyHeight * prePregnancyHeight);
+    }
+
+    public float getCurrentBMI() {
+        return pregnancyWeight / (pregnancyHeight * pregnancyHeight);
+    }
 }

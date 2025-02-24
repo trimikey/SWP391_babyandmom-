@@ -31,4 +31,10 @@ public class GrowthRecordController {
         return ResponseEntity.ok(service.updateGrowthRecord(id, request));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteRecord(@PathVariable Long id) {
+        service.deleteRecord(id);
+        return ResponseEntity.ok("Delete successfully");
+    }
+
 }

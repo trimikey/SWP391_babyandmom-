@@ -1,4 +1,5 @@
 package com.swp.BabyandMom.Entity;
+import com.swp.BabyandMom.Entity.Enum.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,8 +34,9 @@ public class Orders {
     @Column(nullable = false)
     private Double totalPrice;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status;
+    private OrderStatus status;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -46,4 +48,14 @@ public class Orders {
 
     @OneToOne(mappedBy = "order")
     private Transaction transaction;
+
+    @Column(nullable = false)
+    private LocalDateTime startDate; // Ngày kích hoạt gói
+
+    @Column(nullable = false)
+    private LocalDateTime endDate; // Ngày hết hạn gói
+
+    @ManyToOne
+    @JoinColumn(name = "package_id", nullable = false)
+    private Package selectedPackage; // Gói mà user đã chọn
 }

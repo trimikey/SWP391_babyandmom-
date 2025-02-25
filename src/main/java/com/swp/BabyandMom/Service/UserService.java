@@ -62,43 +62,48 @@ public class UserService implements UserDetailsService {
             if (user == null) {
                 logger.warn("Login failed: Email not found - {}", loginRequestDTO.getEmail());
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                        new LoginResponseDTO("Email not found", "Login failed", null, null)
+                        new LoginResponseDTO("Email not found", "Login failed", null, null, null)
                 );
             }
 
             if (user.getStatus().equals(UserStatusEnum.UNVERIFIED)) {
                 logger.warn("Login failed: Account not verified - {}", loginRequestDTO.getEmail());
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-                        new LoginResponseDTO("Account not verified", "Login failed", null, null)
+                        new LoginResponseDTO("Account not verified", "Login failed", null, null, null)
                 );
             }
 
             if (!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
                 logger.warn("Login failed: Incorrect password - {}", loginRequestDTO.getEmail());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                        new LoginResponseDTO("Incorrect email or password", "Login failed", null, null)
+                        new LoginResponseDTO("Incorrect email or password", "Login failed", null, null, null)
                 );
             }
 
             String accessToken = jwtService.generateToken(user.getEmail());
             String refreshToken = jwtService.generateRefreshToken(user.getEmail());
 
-            logger.info("Login successful: {}", loginRequestDTO.getEmail());
+            // 🔥 Trả về Role chính xác
+            RoleType role = user.getRole();
 
-            return ResponseEntity.ok(new LoginResponseDTO("Login successful", "Success", accessToken, refreshToken));
+            logger.info("Login successful: {} - Role: {}", loginRequestDTO.getEmail(), role);
+
+            return ResponseEntity.ok(new LoginResponseDTO("Login successful", "Success", accessToken, refreshToken, role));
 
         } catch (AuthAppException e) {
             logger.error("Authentication error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    new LoginResponseDTO(e.getMessage(), "Login failed", null, null)
+                    new LoginResponseDTO(e.getMessage(), "Login failed", null, null, null)
             );
         } catch (Exception e) {
             logger.error("Unexpected error: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new LoginResponseDTO("An unexpected error occurred", "Login failed", null, null)
+                    new LoginResponseDTO("An unexpected error occurred", "Login failed", null, null, null)
             );
         }
     }
+
+
 
     public ResponseEntity<RegisterResponseDTO> checkRegister(RegisterRequestDTO registerRequestDTO) {
         try {

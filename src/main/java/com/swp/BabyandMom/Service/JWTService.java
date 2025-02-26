@@ -1,23 +1,20 @@
 package com.swp.BabyandMom.Service;
 
-import com.auth0.jwt.JWT;
+
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.swp.BabyandMom.Entity.User;
-import com.swp.BabyandMom.ExceptionHandler.InvalidToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
+import com.swp.BabyandMom.Entity.User;
+import com.swp.BabyandMom.ExceptionHandler.InvalidToken;
+import java.util.Map;
+import java.util.HashMap;
 
 @Component
 public class JWTService {
@@ -111,18 +108,6 @@ public class JWTService {
     public Boolean validateToken(String token, User userDetails) {
         final String userName = extractEmail(token);
         return (userName.equals(userDetails.getEmail()) && !isTokenExpired(token));
-    }
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-
-    public static Map<String, Object> getPayload(String token) throws IOException {
-        try {
-            DecodedJWT decodedJWT = JWT.decode(token);
-            String payload = new String(java.util.Base64.getUrlDecoder().decode(decodedJWT.getPayload()));
-            return objectMapper.readValue(payload, Map.class);
-        } catch (IOException e) {
-            throw new InvalidToken("Error decoding payload: " + e.getMessage());
-        }
     }
 
 }

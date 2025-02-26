@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.lang.NonNull;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -31,17 +32,31 @@ public class JwtFilter extends OncePerRequestFilter {
     private UserService userService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+        @NonNull HttpServletRequest request,
+        @NonNull HttpServletResponse response,
+        @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
 
         String uri = request.getRequestURI();
-        if (uri.contains("/api/login") || uri.contains("/api/register")) {
+        
+        // Cho phép các endpoint công khai
+        if (uri.contains("/api/login") || 
+            uri.contains("/api/register") || 
+            uri.contains("/v3/api-docs") || 
+            uri.contains("/swagger-ui")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            // Nếu không có token và endpoint yêu cầu xác thực
+            if (uri.contains("/api/password")) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Unauthorized - Token required");
+                return;
+            }
             filterChain.doFilter(request, response);
             return;
         }

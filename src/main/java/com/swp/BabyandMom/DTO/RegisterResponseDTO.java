@@ -1,5 +1,4 @@
 package com.swp.BabyandMom.DTO;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

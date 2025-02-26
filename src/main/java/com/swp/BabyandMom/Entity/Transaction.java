@@ -19,7 +19,7 @@ public class Transaction {
 
     @OneToOne
     @JoinColumn(name = "order_id", nullable = false)
-    private Orders order;
+    private Order order;
 
     @Column(nullable = false)
     private Double totalPrice;

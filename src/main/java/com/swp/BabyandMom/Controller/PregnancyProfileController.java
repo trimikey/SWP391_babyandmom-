@@ -6,12 +6,14 @@ import com.swp.BabyandMom.Service.PregnancyProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/pregnancy-profile")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class PregnancyProfileController {
     private final PregnancyProfileService service;
 

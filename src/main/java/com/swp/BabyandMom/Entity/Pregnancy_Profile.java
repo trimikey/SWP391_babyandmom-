@@ -33,10 +33,10 @@ public class Pregnancy_Profile {
     @Column(nullable = true)
     private String lastPeriod;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Float weight;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Float height;
 
     @Column(nullable = false)

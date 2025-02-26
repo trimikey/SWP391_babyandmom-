@@ -9,12 +9,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/membership-packages")
 @CrossOrigin("*")
+@SecurityRequirement(name = "bearerAuth")
 public class MembershipPackageController {
 
     @Autowired

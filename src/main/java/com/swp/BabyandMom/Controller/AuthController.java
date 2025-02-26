@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
-@SecurityRequirement(name = "api")
+@SecurityRequirement(name = "bearerAuth")
 @CrossOrigin("*")
-
+    
 public class AuthController {
     private final UserService userService;
 

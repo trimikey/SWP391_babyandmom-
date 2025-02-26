@@ -1,6 +1,6 @@
 package com.swp.BabyandMom.DTO;
 
-import com.swp.BabyandMom.Entity.Enum.RoleType;
+
 import lombok.*;
 
 @Getter

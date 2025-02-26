@@ -2,6 +2,8 @@ package com.swp.BabyandMom.Entity;
 import com.swp.BabyandMom.Entity.Enum.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import java.time.LocalDateTime;
 @Entity
@@ -9,20 +11,22 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="orders")
-public class Orders {
+public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @JsonManagedReference
+    @OneToOne
     @JoinColumn(name = "subscription_id", nullable = false)
     private Subscription subscription;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String buyerName;
 
     @Column(nullable = false)
@@ -55,7 +59,8 @@ public class Orders {
     @Column(nullable = false)
     private LocalDateTime endDate; // Ngày hết hạn gói
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "package_id", nullable = false)
-    private Package selectedPackage; // Gói mà user đã chọn
+    private Membership_Package selectedPackage; // Gói mà user đã chọn
 }

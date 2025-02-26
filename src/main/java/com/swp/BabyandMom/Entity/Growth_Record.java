@@ -41,9 +41,6 @@ public class Growth_Record {
     @Enumerated(EnumType.STRING)
     private AlertStatus alertStatus;
 
-    @OneToMany(mappedBy = "growthRecord")
-    private List<Warning> warnings;
-
     public float getPrePregnancyBMI() {
         return prePregnancyWeight / (prePregnancyHeight * prePregnancyHeight);
     }

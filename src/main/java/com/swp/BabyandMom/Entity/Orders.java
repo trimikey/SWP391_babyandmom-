@@ -57,5 +57,5 @@ public class Orders {
 
     @ManyToOne
     @JoinColumn(name = "package_id", nullable = false)
-    private Package selectedPackage; // Gói mà user đã chọn
+    private Membership_Package selectedPackage; // Gói mà user đã chọn
 }

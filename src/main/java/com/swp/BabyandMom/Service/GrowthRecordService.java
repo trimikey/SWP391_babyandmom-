@@ -2,6 +2,7 @@ package com.swp.BabyandMom.Service;
 
 import com.swp.BabyandMom.DTO.GrowthRecordRequestDTO;
 import com.swp.BabyandMom.DTO.GrowthRecordResponseDTO;
+import com.swp.BabyandMom.Entity.Enum.AlertStatus;
 import com.swp.BabyandMom.Entity.Growth_Record;
 import com.swp.BabyandMom.Entity.Pregnancy_Profile;
 import com.swp.BabyandMom.Entity.User;
@@ -23,6 +24,19 @@ public class GrowthRecordService {
     private final PregnancyRepository pregnancyRepository;
     private final UserUtils userUtils;
 
+    private Pregnancy_Profile getPregnancyProfileOfCurrentUser() {
+        User currentUser = userUtils.getCurrentAccount();
+        return pregnancyRepository.findByUser(currentUser)
+                .stream().findFirst()
+                .orElseThrow(() -> new RuntimeException("User's pregnancy record not found"));
+    }
+    private Pregnancy_Profile getPregnancyProfileById(Long profileId) {
+        return pregnancyRepository.findById(profileId)
+                .orElseThrow(() -> new RuntimeException("Pregnancy profile not found"));
+    }
+
+
+
     public List<GrowthRecordResponseDTO> getGrowthRecordsByCurrentUser() {
         Pregnancy_Profile pregnancy = getPregnancyProfileOfCurrentUser();
         return repository.findByPregnancy(pregnancy).stream()
@@ -38,7 +52,7 @@ public class GrowthRecordService {
     }
 
     public GrowthRecordResponseDTO createGrowthRecord(GrowthRecordRequestDTO request) {
-        Pregnancy_Profile pregnancy = getPregnancyProfileOfCurrentUser();
+        Pregnancy_Profile pregnancy = getPregnancyProfileById(request.getProfileId()); // Lấy profile theo ID
 
         Growth_Record record = new Growth_Record();
         record.setPregnancy(pregnancy);
@@ -50,9 +64,21 @@ public class GrowthRecordService {
         record.setPrePregnancyHeight(request.getPrePregnancyHeight());
         record.setCreatedAt(LocalDateTime.now());
 
+        float preBMI = record.getPrePregnancyBMI();
+        float currentBMI = record.getCurrentBMI();
+        record.setAlertStatus(determineAlertStatus(
+                record.getPrePregnancyBMI(),
+                record.getCurrentBMI(),
+                request.getPrePregnancyWeight(),
+                request.getPregnancyWeight(),
+                request.getPregnancyWeek()
+        ));
+
+
         repository.save(record);
         return convertToDTO(record);
     }
+
 
     public GrowthRecordResponseDTO updateGrowthRecord(Long id, GrowthRecordRequestDTO request) {
         Growth_Record record = repository.findById(id)
@@ -67,6 +93,18 @@ public class GrowthRecordService {
         record.setPrePregnancyWeight(request.getPrePregnancyWeight());
         record.setPrePregnancyHeight(request.getPrePregnancyHeight());
 
+        // Cập nhật cảnh báo BMI
+        float preBMI = record.getPrePregnancyBMI();
+        float currentBMI = record.getCurrentBMI();
+        record.setAlertStatus(determineAlertStatus(
+                record.getPrePregnancyBMI(),
+                record.getCurrentBMI(),
+                request.getPrePregnancyWeight(),
+                request.getPregnancyWeight(),
+                request.getPregnancyWeek()
+        ));
+
+
         repository.save(record);
         return convertToDTO(record);
     }
@@ -74,6 +112,7 @@ public class GrowthRecordService {
     public void deleteRecord(Long id) {
         Growth_Record record = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Growth record not found"));
+        validateOwnership(record.getPregnancy().getId());
         repository.delete(record);
     }
 
@@ -87,12 +126,42 @@ public class GrowthRecordService {
         }
     }
 
-    private Pregnancy_Profile getPregnancyProfileOfCurrentUser() {
-        User currentUser = userUtils.getCurrentAccount();
-        return pregnancyRepository.findByUser(currentUser)
-                .stream().findFirst()
-                .orElseThrow(() -> new RuntimeException("No pregnancy profile found for current user"));
+    private AlertStatus determineAlertStatus(float preBMI, float currentBMI, float preWeight, float currentWeight, int pregnancyWeek) {
+        String weightWarning = checkWeightGainWarning(preWeight, currentWeight, pregnancyWeek);
+
+        if (currentBMI < preBMI - 2) {
+            return AlertStatus.LOW;  // BMI giảm mạnh -> cảnh báo thấp
+        } else if (currentBMI > preBMI + 3) {
+            return AlertStatus.HIGH; // BMI tăng mạnh -> cảnh báo cao
+        } else if (weightWarning.contains("too little") || weightWarning.contains("too much")) {
+            return AlertStatus.WARNING; // Nếu cân nặng tăng bất thường nhưng BMI vẫn ổn
+        }
+        return AlertStatus.NORMAL;
     }
+
+
+    private String checkWeightGainWarning(float preWeight, float currentWeight, int pregnancyWeek) {
+        float expectedMin = 0, expectedMax = 0;
+        float weightGain = currentWeight - preWeight;
+
+        float preBMI = preWeight / (preWeight * preWeight);
+
+        if (preBMI >= 18.5 && preBMI <= 24.9) { // BMI bình thường
+            expectedMin = (pregnancyWeek <= 12) ? 1 : (pregnancyWeek <= 24) ? 4 : 10;
+            expectedMax = (pregnancyWeek <= 12) ? 1 : (pregnancyWeek <= 24) ? 5 : 12;
+        } else if (preBMI < 18.5) { // BMI thấp
+            expectedMin = preWeight * 0.25f;
+            expectedMax = 18.3f;
+        } else if (preBMI >= 25) { // BMI cao
+            expectedMin = preWeight * 0.15f;
+            expectedMax = 11.3f;
+        }
+
+        if (weightGain < expectedMin) return "Gaining too little weight can affect the fetus";
+        if (weightGain > expectedMax) return "Gain too much weight, need to control diet";
+        return "Normal weight gain";
+    }
+
 
     private GrowthRecordResponseDTO convertToDTO(Growth_Record record) {
         return new GrowthRecordResponseDTO(
@@ -103,6 +172,10 @@ public class GrowthRecordService {
                 record.getNotes(),
                 record.getPrePregnancyWeight(),
                 record.getPrePregnancyHeight(),
+                record.getPrePregnancyBMI(),
+                record.getCurrentBMI(),
+                checkWeightGainWarning(record.getPrePregnancyWeight(), record.getPregnancyWeight(), record.getPregnancyWeek()),
+                record.getAlertStatus(),
                 record.getCreatedAt()
         );
     }

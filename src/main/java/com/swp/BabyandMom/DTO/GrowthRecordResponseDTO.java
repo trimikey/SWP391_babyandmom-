@@ -16,5 +16,9 @@ public class GrowthRecordResponseDTO {
     private String notes;
     private Float prePregnancyWeight;
     private Float prePregnancyHeight;
+    private Float prePregnancyBMI;
+    private Float currentBMI;
+    private String weightWarning;
+    private AlertStatus alertStatus;
     private LocalDateTime createdAt;
 }

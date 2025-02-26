@@ -52,9 +52,19 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(req -> req.anyRequest().permitAll())
-
-
+                .authorizeHttpRequests(auth -> auth
+                    .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/v3/api-docs.yaml",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/webjars/**",
+                        "/api/login",
+                        "/api/register"
+                    ).permitAll()
+                    .requestMatchers("/api/password/**").authenticated()
+                    .anyRequest().permitAll()
+                )
                 .formLogin(AbstractAuthenticationFilterConfigurer::disable)
                 .logout(LogoutConfigurer::permitAll)
                 .exceptionHandling(eh -> eh.accessDeniedPage("/403"))

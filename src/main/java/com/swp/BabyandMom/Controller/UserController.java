@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/password")
 @RequiredArgsConstructor
-@SecurityRequirement(name = "api")
+@SecurityRequirement(name = "bearerAuth")
 @CrossOrigin("*")
 
 public class UserController {

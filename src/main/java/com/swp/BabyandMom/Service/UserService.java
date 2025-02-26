@@ -4,12 +4,9 @@ import com.swp.BabyandMom.DTO.*;
 import com.swp.BabyandMom.Entity.Enum.RoleType;
 import com.swp.BabyandMom.Entity.Enum.UserStatusEnum;
 import com.swp.BabyandMom.Entity.User;
-import com.swp.BabyandMom.Entity.Pregnancy_Profile;
 import com.swp.BabyandMom.ExceptionHandler.AuthAppException;
-import com.swp.BabyandMom.ExceptionHandler.ErrorCode;
 import com.swp.BabyandMom.ExceptionHandler.NotLoginException;
 import com.swp.BabyandMom.Repository.UserRepository;
-import com.swp.BabyandMom.Repository.PregnancyRepository;
 import com.swp.BabyandMom.Utils.UpdateUtils;
 import com.swp.BabyandMom.Utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -36,9 +32,6 @@ public class UserService implements UserDetailsService {
     private UserUtils userUtils;
     @Autowired
     private JWTService jwtService;
-    @Autowired
-    private PregnancyRepository pregnancyRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 

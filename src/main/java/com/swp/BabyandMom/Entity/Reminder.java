@@ -2,9 +2,9 @@ package com.swp.BabyandMom.Entity;
 import com.swp.BabyandMom.Entity.Enum.ReminderType;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
-import java.util.List;
+
 @Entity
 @Data
 @NoArgsConstructor

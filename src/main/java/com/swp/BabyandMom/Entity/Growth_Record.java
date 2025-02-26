@@ -42,10 +42,11 @@ public class Growth_Record {
     private AlertStatus alertStatus;
 
     public float getPrePregnancyBMI() {
-        return prePregnancyWeight / (prePregnancyHeight * prePregnancyHeight);
+        return prePregnancyWeight / ((prePregnancyHeight / 100) * (prePregnancyHeight / 100));
     }
 
     public float getCurrentBMI() {
-        return pregnancyWeight / (pregnancyHeight * pregnancyHeight);
+        return pregnancyWeight / ((pregnancyHeight / 100) * (pregnancyHeight / 100));
     }
+
 }

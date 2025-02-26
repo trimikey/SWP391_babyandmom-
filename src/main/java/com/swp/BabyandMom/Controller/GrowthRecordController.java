@@ -16,7 +16,7 @@ import java.util.List;
 public class GrowthRecordController {
     private final GrowthRecordService growthRecordService;
 
-    @GetMapping
+    @GetMapping("/current")
     public ResponseEntity<List<GrowthRecordResponseDTO>> getAllGrowthRecords() {
         return ResponseEntity.ok(growthRecordService.getGrowthRecordsByCurrentUser());
     }
@@ -39,8 +39,8 @@ public class GrowthRecordController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGrowthRecord(@PathVariable Long id) {
+    public ResponseEntity<String> deleteGrowthRecord(@PathVariable Long id) {
         growthRecordService.deleteRecord(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Delete successfully");
     }
 }

@@ -24,12 +24,13 @@ public class GrowthRecordService {
     private final PregnancyRepository pregnancyRepository;
     private final UserUtils userUtils;
 
-    private Pregnancy_Profile getPregnancyProfileOfCurrentUser() {
+    private Pregnancy_Profile getPregnancyProfileOfCurrentUser(Long profileId) {
         User currentUser = userUtils.getCurrentAccount();
-        return pregnancyRepository.findByUser(currentUser)
-                .stream().findFirst()
-                .orElseThrow(() -> new RuntimeException("User's pregnancy record not found"));
+        return pregnancyRepository.findById(profileId)
+                .filter(profile -> profile.getUser().getId().equals(currentUser.getId()))
+                .orElseThrow(() -> new RuntimeException("Pregnancy profile not found or not owned by user"));
     }
+
     private Pregnancy_Profile getPregnancyProfileById(Long profileId) {
         return pregnancyRepository.findById(profileId)
                 .orElseThrow(() -> new RuntimeException("Pregnancy profile not found"));
@@ -37,12 +38,14 @@ public class GrowthRecordService {
 
 
 
-    public List<GrowthRecordResponseDTO> getGrowthRecordsByCurrentUser() {
-        Pregnancy_Profile pregnancy = getPregnancyProfileOfCurrentUser();
-        return repository.findByPregnancy(pregnancy).stream()
+    public List<GrowthRecordResponseDTO> getGrowthRecordsByCurrentUser(Long profileId) {
+        Pregnancy_Profile pregnancy = getPregnancyProfileOfCurrentUser(profileId);
+        return repository.findByPregnancyAndIsDeletedFalse(pregnancy).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+
 
     public GrowthRecordResponseDTO getGrowthRecordById(Long id) {
         Growth_Record record = repository.findById(id)
@@ -108,9 +111,13 @@ public class GrowthRecordService {
     public void deleteRecord(Long id) {
         Growth_Record record = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Growth record not found"));
+
         validateOwnership(record.getPregnancy().getId());
-        repository.delete(record);
+
+        record.setIsDeleted(true);
+        repository.save(record);
     }
+
 
     private void validateOwnership(Long profileId) {
         User currentUser = userUtils.getCurrentAccount();

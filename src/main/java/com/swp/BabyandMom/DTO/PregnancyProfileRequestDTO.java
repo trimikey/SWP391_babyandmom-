@@ -23,7 +23,7 @@ public class PregnancyProfileRequestDTO {
     private Integer currentWeek;
 
     @NotNull(message = "Last Period cannot be left blank")
-    private String lastPeriod;
+    private LocalDateTime lastPeriod;
 
     @NotNull(message = "Height cannot be left blank")
     private Float height;

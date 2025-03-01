@@ -15,6 +15,6 @@ public class PregnancyProfileResponseDTO {
     private String babyGender;
     private LocalDateTime dueDate;
     private Integer currentWeek;
-    private String lastPeriod;
+    private LocalDateTime lastPeriod;
     private Float height;
 }

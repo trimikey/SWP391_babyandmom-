@@ -38,6 +38,9 @@ public class Growth_Record {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private Boolean isDeleted = false;
+
     @Enumerated(EnumType.STRING)
     private AlertStatus alertStatus;
 

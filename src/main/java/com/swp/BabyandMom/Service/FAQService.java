@@ -17,13 +17,14 @@ public class FAQService {
     public FAQService(FAQRepository faqRepository) {
         this.faqRepository = faqRepository;
     }
-
     public List<FAQResponseDTO> getAllFAQs() {
-        return faqRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+        return faqRepository.findByIsDeletedFalse().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     public FAQResponseDTO getFAQById(Long id) {
-        FAQ faq = faqRepository.findById(id)
+        FAQ faq = faqRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new RuntimeException("FAQ not found"));
         return convertToDTO(faq);
     }
@@ -35,13 +36,14 @@ public class FAQService {
         faq.setDisplayOrder(request.getDisplayOrder());
         faq.setIsActive(request.getIsActive() != null ? request.getIsActive() : true);
         faq.setCreatedAt(LocalDateTime.now());
+        faq.setIsDeleted(false);
 
         faqRepository.save(faq);
         return convertToDTO(faq);
     }
 
     public FAQResponseDTO updateFAQ(Long id, FAQRequestDTO request) {
-        FAQ faq = faqRepository.findById(id)
+        FAQ faq = faqRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new RuntimeException("FAQ not found"));
 
         faq.setName(request.getName());
@@ -55,9 +57,13 @@ public class FAQService {
     }
 
     public void deleteFAQ(Long id) {
-        FAQ faq = faqRepository.findById(id)
+        FAQ faq = faqRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new RuntimeException("FAQ not found"));
-        faqRepository.delete(faq);
+
+        faq.setIsDeleted(true);
+        faq.setUpdatedAt(LocalDateTime.now());
+
+        faqRepository.save(faq);
     }
 
     private FAQResponseDTO convertToDTO(FAQ faq) {

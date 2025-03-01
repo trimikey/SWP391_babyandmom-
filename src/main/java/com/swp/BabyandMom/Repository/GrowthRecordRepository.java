@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface GrowthRecordRepository extends JpaRepository<Growth_Record, Long> {
     List<Growth_Record> findByPregnancy(Pregnancy_Profile pregnancy);
+    List<Growth_Record> findByPregnancyAndIsDeletedFalse(Pregnancy_Profile pregnancy);
+
 }

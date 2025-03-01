@@ -21,13 +21,14 @@ public class PregnancyProfileService {
 
     public List<PregnancyProfileResponseDTO> getAllProfiles() {
         User currentUser = userUtils.getCurrentAccount();
-        return repository.findByUser(currentUser).stream()
+        return repository.findByUserAndIsDeletedFalse(currentUser).stream()
                 .map(profile -> new PregnancyProfileResponseDTO(
-                        profile.getId(),profile.getBabyName(),profile.getBabyGender(), profile.getDueDate(),
+                        profile.getId(), profile.getBabyName(), profile.getBabyGender(), profile.getDueDate(),
                         profile.getCurrentWeek(), profile.getLastPeriod(),
                         profile.getHeight()))
                 .collect(Collectors.toList());
     }
+
 
     public PregnancyProfileResponseDTO createProfile(PregnancyProfileRequestDTO request) {
         User currentUser = userUtils.getCurrentAccount();
@@ -68,6 +69,8 @@ public class PregnancyProfileService {
     public void deleteProfile(Long id) {
         Pregnancy_Profile profile = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Profile not found"));
-        repository.delete(profile);
+        profile.setIsDeleted(true);
+        repository.save(profile);
     }
+
 }

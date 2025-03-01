@@ -1,17 +1,21 @@
 package com.swp.BabyandMom.DTO;
 
+import com.swp.BabyandMom.Entity.Enum.RoleType;
+
 public class LoginResponseDTO {
 
     private String message;
     private String error;
     private String accessToken;
     private String refreshToken;
+    private RoleType role;
 
-    public LoginResponseDTO(String message, String error, String accessToken, String refreshToken) {
+    public LoginResponseDTO(String message, String error, String accessToken, String refreshToken, RoleType role) {
         this.message = message;
         this.error = error;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
+        this.role = role;
     }
     public String getMessage() {
         return message;
@@ -43,5 +47,12 @@ public class LoginResponseDTO {
 
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+    public RoleType getRole() {
+        return role;
+    }
+
+    public void setRole(RoleType role) {
+        this.role = role;
     }
 }

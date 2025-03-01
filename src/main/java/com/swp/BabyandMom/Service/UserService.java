@@ -20,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -34,6 +36,8 @@ public class UserService implements UserDetailsService {
     private JWTService jwtService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private EmailService emailService;
 
     public User getAccountByEmail(String email) {
         Optional<User> account = userRepository.findByEmail(email);
@@ -81,6 +85,12 @@ public class UserService implements UserDetailsService {
 
             logger.info("Login successful: {} - Role: {}", loginRequestDTO.getEmail(), role);
 
+            emailService.sendEmail(
+                    loginRequestDTO.getEmail(),
+                    "Login Notification",
+                    "Welcome " + user.getFullName() + " ! , you have successfully logged in!"
+            );
+
             return ResponseEntity.ok(new LoginResponseDTO("Login successful", "Success", accessToken, refreshToken, role));
 
         } catch (AuthAppException e) {
@@ -114,7 +124,7 @@ public class UserService implements UserDetailsService {
 
             // Tạo user mới
             User newUser = new User();
-            newUser.setFullName(registerRequestDTO.getName());
+            newUser.setFullName(registerRequestDTO.getFullName());
             newUser.setUserName(registerRequestDTO.getUserName());
             newUser.setPhoneNumber(registerRequestDTO.getPhoneNumber());
             newUser.setEmail(registerRequestDTO.getEmail());
@@ -133,6 +143,12 @@ public class UserService implements UserDetailsService {
                     savedUser.getUserName(),
                     savedUser.getEmail(),
                     "Registered successfully"
+            );
+
+            emailService.sendEmail(
+                    registerRequestDTO.getEmail(),
+                    "Account Registration Confirmation",
+                    "Congratulation " + registerRequestDTO.getFullName()+ " ! , you have successfully registered an account !"
             );
 
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
@@ -180,7 +196,10 @@ public class UserService implements UserDetailsService {
     }
 
     public ResponseEntity<ChangePasswordResponseDTO> changePassword(ChangePasswordRequestDTO request) {
+
+
         logger.info("Processing change password request");
+
         
         try {
             User currentUser = userUtils.getCurrentAccount();
@@ -223,6 +242,64 @@ public class UserService implements UserDetailsService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ChangePasswordResponseDTO("An unexpected error occurred", "Failed"));
         }
+
+    }
+
+
+
+    public ResponseEntity<String> resetPassword(ResetPasswordRequestDTO resetPasswordRequestDTO){
+
+
+        Optional<User> user = userRepository.findByEmail(resetPasswordRequestDTO.getEmail());
+        if(user.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email does not exist !");
+        if(!user.get().getResetCode().equals(resetPasswordRequestDTO.getCode()) || user.get().getResetCode()==null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid reset code !");
+        }
+        if(user.get().getResetCodeExpiration().isBefore(LocalDateTime.now())){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Reset code has expired !");
+        }
+
+        user.get().setPassword(passwordEncoder.encode(resetPasswordRequestDTO.getNewPassword()));
+        user.get().setResetCode(null);
+        user.get().setResetCodeExpiration(null);
+        userRepository.save(user.get());
+
+        emailService.sendEmail(
+                user.get().getEmail(),
+                "Password Reset Successfully",
+                "Your password has been reset successfully. If you did not perform this action, please contact us immediately."
+        );
+
+        return ResponseEntity.ok("Password has been reset successfully !");
+    }
+
+    public ResponseEntity<String> forgotPassword (ForgotPasswordRequestDTO forgotPasswordRequestDTO){
+        Optional<User> user = userRepository.findByEmail(forgotPasswordRequestDTO.getEmail());
+
+        if(user.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email does not exist !");
+
+        String resetPasswordCode = generateCode();
+
+        emailService.sendEmail(forgotPasswordRequestDTO.getEmail(),"Forgot Password Code","Your reset code is: " + resetPasswordCode);
+
+        user.get().setResetCode(resetPasswordCode);
+        user.get().setResetCodeExpiration(LocalDateTime.now().plusMinutes(10)); // Code có hiệu lực trong 10 phút
+        userRepository.save(user.get());
+
+        String token = jwtService.generateToken(user.get().getEmail());
+
+        return ResponseEntity.ok("Reset code has been sent to your email! "+ ", " + "token" + token);
+    }
+
+    // Hàm tạo resetPasswordCode
+
+    private String generateCode(){
+        Random random = new Random();
+
+        int code = random.nextInt(100000);
+
+        return String.valueOf(code);
+
     }
 
 }

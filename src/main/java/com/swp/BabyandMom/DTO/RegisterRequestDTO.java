@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RegisterRequestDTO {
     // Thông tin user hiện tại
-    private String name;
+    private String fullName;
     private String userName;
     private String phoneNumber;
     private String email;

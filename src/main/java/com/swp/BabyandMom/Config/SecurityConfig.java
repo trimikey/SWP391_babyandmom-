@@ -51,7 +51,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers(
                         "/v3/api-docs/**",
@@ -62,8 +62,8 @@ public class SecurityConfig {
                         "/api/login",
                         "/api/register"
                     ).permitAll()
-                    .requestMatchers("/api/password/**").authenticated()
-                    .anyRequest().permitAll()
+                    .requestMatchers("/api/password/**").permitAll()
+                    .anyRequest().authenticated()
                 )
                 .formLogin(AbstractAuthenticationFilterConfigurer::disable)
                 .logout(LogoutConfigurer::permitAll)

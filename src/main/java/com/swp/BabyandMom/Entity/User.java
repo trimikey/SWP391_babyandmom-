@@ -46,6 +46,65 @@ public class User implements UserDetails {
     @Transient
     private String tokens;
 
+    private String resetCode;
+
+    private LocalDateTime resetCodeExpiration;
+
+
+
+
+
+
+    // GETTER AND SETTER
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public RoleType getRole() {
+        return role;
+    }
+
+    public void setRole(RoleType role) {
+        this.role = role;
+    }
+
+    public LocalDateTime getResetCodeExpiration() {
+        return resetCodeExpiration;
+    }
+
+    public void setResetCodeExpiration(LocalDateTime resetCodeExpiration) {
+        this.resetCodeExpiration = resetCodeExpiration;
+    }
+
+    public String getResetCode() {
+        return resetCode;
+    }
+
+    public void setResetCode(String resetCode) {
+        this.resetCode = resetCode;
+    }
+
+    public LocalDateTime getTokenExpirationDate() {
+        return tokenExpirationDate;
+    }
+
+    public void setTokenExpirationDate(LocalDateTime tokenExpirationDate) {
+        this.tokenExpirationDate = tokenExpirationDate;
+    }
+
+    public String getVerificationToken() {
+        return verificationToken;
+    }
+
+    public void setVerificationToken(String verificationToken) {
+        this.verificationToken = verificationToken;
+    }
+
     public Long getId() {
         return id;
     }

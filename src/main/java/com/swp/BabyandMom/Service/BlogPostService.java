@@ -21,13 +21,13 @@ public class BlogPostService {
     private final UserUtils userUtils;
 
     public List<BlogPostResponseDTO> getAllPosts() {
-        return repository.findAll().stream()
+        return repository.findByIsDeletedFalse().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     public BlogPostResponseDTO getPostById(Long id) {
-        BlogPost post = repository.findById(id)
+        BlogPost post = repository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new RuntimeException("Blog post not found"));
         return convertToDTO(post);
     }
@@ -44,13 +44,14 @@ public class BlogPostService {
         post.setContent(request.getContent());
         post.setCreatedAt(LocalDateTime.now());
         post.setUpdatedAt(LocalDateTime.now());
+        post.setIsDeleted(false);
 
         repository.save(post);
         return convertToDTO(post);
     }
 
     public BlogPostResponseDTO updatePost(Long id, BlogPostRequestDTO request) {
-        BlogPost post = repository.findById(id)
+        BlogPost post = repository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new RuntimeException("Blog post not found"));
 
         validateOwnership(post.getUser());
@@ -64,12 +65,15 @@ public class BlogPostService {
     }
 
     public void deletePost(Long id) {
-        BlogPost post = repository.findById(id)
+        BlogPost post = repository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new RuntimeException("Blog post not found"));
 
         validateOwnership(post.getUser());
 
-        repository.delete(post);
+        post.setIsDeleted(true);
+        post.setUpdatedAt(LocalDateTime.now());
+
+        repository.save(post);
     }
 
     private void validateOwnership(User postOwner) {

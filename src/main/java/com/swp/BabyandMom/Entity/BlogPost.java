@@ -26,6 +26,9 @@ public class BlogPost {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false)
+    private Boolean isDeleted = false;
+
     @OneToMany(mappedBy = "blogPost", cascade = CascadeType.ALL)
     private List<Comment> comments;
 }

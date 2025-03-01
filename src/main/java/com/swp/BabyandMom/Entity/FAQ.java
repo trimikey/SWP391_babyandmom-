@@ -25,6 +25,9 @@ public class FAQ {
     private Boolean isActive = true;
 
     @Column(nullable = false)
+    private Boolean isDeleted = false;
+
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

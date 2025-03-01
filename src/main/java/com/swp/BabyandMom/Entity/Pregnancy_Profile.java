@@ -31,7 +31,7 @@ public class Pregnancy_Profile {
     private Integer currentWeek;
 
     @Column(nullable = true)
-    private String lastPeriod;
+    private LocalDateTime lastPeriod;
 
     @Column(nullable = true)
     private Float weight;
@@ -46,6 +46,9 @@ public class Pregnancy_Profile {
 
     @Column(nullable = false)
     private Boolean isActive = true;
+
+    @Column(nullable = false)
+    private Boolean isDeleted = false;
 
     @Column(nullable = false)
     private Boolean isNormal = true;

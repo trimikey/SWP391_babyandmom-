@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/growth-records")
@@ -17,9 +18,12 @@ public class GrowthRecordController {
     private final GrowthRecordService growthRecordService;
 
     @GetMapping("/current")
-    public ResponseEntity<List<GrowthRecordResponseDTO>> getAllGrowthRecords() {
-        return ResponseEntity.ok(growthRecordService.getGrowthRecordsByCurrentUser());
+    public ResponseEntity<List<GrowthRecordResponseDTO>> getAllGrowthRecords(@RequestBody Map<String, Long> requestBody) {
+        Long profileId = requestBody.get("profileId");
+        return ResponseEntity.ok(growthRecordService.getGrowthRecordsByCurrentUser(profileId));
     }
+
+
 
     @GetMapping("/{id}")
     public ResponseEntity<GrowthRecordResponseDTO> getGrowthRecordById(@PathVariable Long id) {

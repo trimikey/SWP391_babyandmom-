@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface PregnancyRepository extends JpaRepository<Pregnancy_Profile, Long> {
     List<Pregnancy_Profile> findByUser(User user);
-
+    List<Pregnancy_Profile> findByUserAndIsDeletedFalse(User user);
 }
 

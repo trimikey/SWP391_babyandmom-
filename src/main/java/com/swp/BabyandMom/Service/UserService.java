@@ -296,7 +296,7 @@ public class UserService implements UserDetailsService {
     private String generateCode(){
         Random random = new Random();
 
-        int code = random.nextInt(100000);
+        int code = random.nextInt(1000000);
 
         return String.valueOf(code);
 

@@ -1,9 +1,12 @@
 package com.swp.BabyandMom.Service;
-
 import com.swp.BabyandMom.DTO.FAQRequestDTO;
 import com.swp.BabyandMom.DTO.FAQResponseDTO;
 import com.swp.BabyandMom.Entity.FAQ;
 import com.swp.BabyandMom.Repository.FAQRepository;
+import com.swp.BabyandMom.Utils.UserUtils;
+import com.swp.BabyandMom.Entity.Enum.RoleType;
+import com.swp.BabyandMom.Entity.User;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -13,10 +16,20 @@ import java.util.stream.Collectors;
 @Service
 public class FAQService {
     private final FAQRepository faqRepository;
+    private final UserUtils userUtils;
 
-    public FAQService(FAQRepository faqRepository) {
+    public FAQService(FAQRepository faqRepository, UserUtils userUtils) {
         this.faqRepository = faqRepository;
+        this.userUtils = userUtils;
     }
+
+    private void checkAdminPermission() {
+        User currentUser = userUtils.getCurrentAccount();
+        if (currentUser == null || currentUser.getRole() != RoleType.ADMIN) {
+            throw new AccessDeniedException("You do not have ADMIN privileges to perform this action.");
+        }
+    }
+
     public List<FAQResponseDTO> getAllFAQs() {
         return faqRepository.findByIsDeletedFalse().stream()
                 .map(this::convertToDTO)
@@ -30,6 +43,8 @@ public class FAQService {
     }
 
     public FAQResponseDTO createFAQ(FAQRequestDTO request) {
+        checkAdminPermission();
+
         FAQ faq = new FAQ();
         faq.setName(request.getName());
         faq.setDescription(request.getDescription());
@@ -43,6 +58,8 @@ public class FAQService {
     }
 
     public FAQResponseDTO updateFAQ(Long id, FAQRequestDTO request) {
+        checkAdminPermission();
+
         FAQ faq = faqRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new RuntimeException("FAQ not found"));
 
@@ -57,6 +74,8 @@ public class FAQService {
     }
 
     public void deleteFAQ(Long id) {
+        checkAdminPermission();
+
         FAQ faq = faqRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new RuntimeException("FAQ not found"));
 
@@ -78,3 +97,4 @@ public class FAQService {
         );
     }
 }
+

@@ -3,15 +3,15 @@ package com.swp.BabyandMom.Controller;
 import com.swp.BabyandMom.DTO.FAQRequestDTO;
 import com.swp.BabyandMom.DTO.FAQResponseDTO;
 import com.swp.BabyandMom.Service.FAQService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/faqs")
-@SecurityRequirement(name = "bearerAuth")
+@CrossOrigin("*")
 public class FAQController {
     private final FAQService faqService;
 
@@ -45,6 +45,6 @@ public class FAQController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteFAQ(@PathVariable Long id) {
         faqService.deleteFAQ(id);
-        return ResponseEntity.ok("FAQ đã được xóa thành công");
+        return ResponseEntity.ok("FAQ was successfully deleted");
     }
 }

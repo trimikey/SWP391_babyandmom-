@@ -2,9 +2,12 @@ package com.swp.BabyandMom.Controller;
 
 import com.swp.BabyandMom.DTO.OrderRequestDTO;
 import com.swp.BabyandMom.DTO.OrderResponseDTO;
+import com.swp.BabyandMom.Entity.Enum.MembershipType;
 import com.swp.BabyandMom.Entity.Enum.OrderStatus;
 import com.swp.BabyandMom.Entity.Order;
 import com.swp.BabyandMom.Service.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +26,24 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
+//    // 1️⃣ API Tạo đơn hàng
+//    @PostMapping("/create")
+//    public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody OrderRequestDTO orderDTO) {
+//        OrderResponseDTO createdOrder = orderService.createOrder(orderDTO);
+//        return ResponseEntity.ok(createdOrder);
+//    }
+
+
     // 1️⃣ API Tạo đơn hàng
     @PostMapping("/create")
-    public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody OrderRequestDTO orderDTO) {
-        OrderResponseDTO createdOrder = orderService.createOrder(orderDTO);
-        return ResponseEntity.ok(createdOrder);
+    @Operation(summary = "Create Order by Membership Type")
+    public ResponseEntity<OrderResponseDTO> createOrderByType(
+            @Parameter(description = "Type of Membership Package", required = true)
+            @RequestParam MembershipType membershipType) {
+        return ResponseEntity.ok(orderService.createOrdersByType(membershipType));
     }
+
+
 
     // 2️⃣ API Lấy danh sách đơn hàng theo trạng thái
     @GetMapping("/status/{status}")

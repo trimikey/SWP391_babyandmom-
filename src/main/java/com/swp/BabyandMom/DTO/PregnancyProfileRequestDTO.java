@@ -1,4 +1,5 @@
 package com.swp.BabyandMom.DTO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class PregnancyProfileRequestDTO {
     private Integer currentWeek;
 
     @NotNull(message = "Last Period cannot be left blank")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime lastPeriod;
 
     @NotNull(message = "Height cannot be left blank")

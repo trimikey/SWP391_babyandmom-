@@ -4,6 +4,7 @@ import com.swp.BabyandMom.DTO.OrderRequestDTO;
 import com.swp.BabyandMom.DTO.OrderResponseDTO;
 
 
+import com.swp.BabyandMom.Entity.Enum.MembershipType;
 import com.swp.BabyandMom.Entity.Enum.OrderStatus;
 import com.swp.BabyandMom.Entity.Membership_Package;
 import com.swp.BabyandMom.Entity.Order;
@@ -14,6 +15,7 @@ import com.swp.BabyandMom.Repository.SubscriptionRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -48,8 +50,8 @@ public class OrderService {
         Subscription subscription = new Subscription();
         subscription.setUser(user);
         subscription.setMembershipPackage(selectedPackage);
-//        subscription.setStartDate(LocalDateTime.now());
-//        subscription.setEndDate(LocalDateTime.now().plusMonths(selectedPackage.getDurationInMonths()));
+        subscription.setStartDate(LocalDateTime.now());
+        subscription.setEndDate(LocalDateTime.now().plusMonths(selectedPackage.getDurationInMonths()));
         subscription.setIsActive(true);
         subscription = subscriptionRepository.save(subscription);
 
@@ -79,6 +81,64 @@ public class OrderService {
             savedOrder.getStartDate(),
             savedOrder.getEndDate(),
             savedOrder.getSelectedPackage().getType().toString()
+        );
+    }
+
+    public List<OrderResponseDTO> getOrdersByStatus(OrderStatus status) {
+        return orderRepository.findByStatus(status).stream()
+                .map(order -> new OrderResponseDTO(
+                        order.getId(),
+                        order.getBuyerName(),
+                        order.getBuyerEmail(),
+                        order.getBuyerPhone(),
+                        order.getTotalPrice(),
+                        order.getStatus(),
+                        order.getStartDate(),
+                        order.getEndDate(),
+                        order.getSelectedPackage().getType().toString()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public OrderResponseDTO createOrdersByType(MembershipType membershipType) {
+        String loggedInEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.getAccountByEmail(loggedInEmail);
+        Membership_Package selectedPackage = membershipPackageRepository.findByType(membershipType)
+                .orElseThrow(() -> new RuntimeException("Type not found"));
+        Subscription subscription = new Subscription();
+        subscription.setUser(user);
+        subscription.setMembershipPackage(selectedPackage);
+        subscription.setStartDate(LocalDateTime.now());
+        subscription.setEndDate(LocalDateTime.now().plusMonths(selectedPackage.getDurationInMonths()));
+        subscription.setIsActive(true);
+        subscription = subscriptionRepository.save(subscription);
+
+        Order order = new Order();
+        order.setUser(user);
+        order.setSelectedPackage(selectedPackage);
+        order.setSubscription(subscription);
+        order.setBuyerName(user.getName());
+        order.setBuyerEmail(user.getEmail());
+        order.setBuyerPhone(user.getPhoneNumber());
+        order.setTotalPrice(selectedPackage.getPrice().doubleValue());
+        order.setStatus(OrderStatus.PENDING);
+        order.setCreatedAt(LocalDateTime.now());
+        order.setStartDate(LocalDateTime.now());
+        order.setEndDate(LocalDateTime.now());
+        order.setIsDeleted(false);
+
+        Order savedOrder = orderRepository.save(order);
+
+        return new OrderResponseDTO(
+                savedOrder.getId(),
+                savedOrder.getBuyerName(),
+                savedOrder.getBuyerEmail(),
+                savedOrder.getBuyerPhone(),
+                savedOrder.getTotalPrice(),
+                savedOrder.getStatus(),
+                savedOrder.getStartDate(),
+                savedOrder.getEndDate(),
+                savedOrder.getSelectedPackage().getType().toString()
         );
     }
 
@@ -143,21 +203,7 @@ public class OrderService {
         System.out.println("Updated order status successful");
     }
 
-    public List<OrderResponseDTO> getOrdersByStatus(OrderStatus status) {
-        return orderRepository.findByStatus(status).stream()
-            .map(order -> new OrderResponseDTO(
-                order.getId(),
-                order.getBuyerName(),
-                order.getBuyerEmail(),
-                order.getBuyerPhone(),
-                order.getTotalPrice(),
-                order.getStatus(),
-                order.getStartDate(),
-                order.getEndDate(),
-                order.getSelectedPackage().getType().toString()
-            ))
-            .collect(Collectors.toList());
-    }
+
 
     public List<Order> getALlOrders(){
         return orderRepository.findAll();

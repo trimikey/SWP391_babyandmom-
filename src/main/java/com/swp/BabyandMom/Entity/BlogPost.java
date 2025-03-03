@@ -28,7 +28,7 @@ public class BlogPost {
 
     @Column(nullable = false)
     private Boolean isDeleted = false;
-
+    
     @OneToMany(mappedBy = "blogPost", cascade = CascadeType.ALL)
     private List<Comment> comments;
 }

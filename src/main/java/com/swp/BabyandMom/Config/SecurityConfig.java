@@ -62,8 +62,10 @@ public class SecurityConfig {
                         "/api/login",
                         "/api/register"
                     ).permitAll()
-                    .requestMatchers("/api/password/**").permitAll()
-                    .anyRequest().authenticated()
+                        .requestMatchers("/api/user/**").permitAll()
+                        .requestMatchers("/api/faqs/**").permitAll()
+                        .anyRequest().authenticated()
+
                 )
                 .formLogin(AbstractAuthenticationFilterConfigurer::disable)
                 .logout(LogoutConfigurer::permitAll)

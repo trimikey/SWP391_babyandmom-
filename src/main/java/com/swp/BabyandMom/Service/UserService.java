@@ -21,8 +21,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -301,8 +303,6 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.ok("Reset code has been sent to your email! "+ ", " + "token" + token);
     }
 
-    // Hàm tạo resetPasswordCode
-
     private String generateCode(){
         Random random = new Random();
 
@@ -310,6 +310,83 @@ public class UserService implements UserDetailsService {
 
         return String.valueOf(code);
 
+    }
+
+    private void checkAdminPermission() {
+        User currentUser = userUtils.getCurrentAccount();
+        if (currentUser == null || currentUser.getRole() != RoleType.ADMIN) {
+            throw new RuntimeException("Access Denied: Only Admin can perform this action");
+        }
+    }
+
+    public List<UserDTO> getAllMembers() {
+        checkAdminPermission();
+        return userRepository.findByRole(RoleType.MEMBER).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public UserDTO getUserById(Long userId) {
+        checkAdminPermission();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return convertToDTO(user);
+    }
+
+    public UserDTO updateUser(Long userId, UserDTO userDTO) {
+        checkAdminPermission();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (userDTO.getFullName() != null && !userDTO.getFullName().isEmpty()) {
+            user.setFullName(userDTO.getFullName());
+        }
+        if (userDTO.getUserName() != null && !userDTO.getUserName().isEmpty()) {
+            user.setUserName(userDTO.getUserName());
+        } else if (user.getUserName() == null) {
+            throw new RuntimeException("UserName cannot be null");
+        }
+        if (userDTO.getEmail() != null && !userDTO.getEmail().isEmpty()) {
+            user.setEmail(userDTO.getEmail());
+        }
+        if (userDTO.getPhone() != null && !userDTO.getPhone().isEmpty()) {
+            user.setPhoneNumber(userDTO.getPhone());
+        }
+
+        userRepository.save(user);
+        return convertToDTO(user);
+    }
+
+
+    public UserDTO updateUserStatus(Long userId, UserStatusEnum status) {
+        checkAdminPermission();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setStatus(status);
+        userRepository.save(user);
+        return convertToDTO(user);
+    }
+
+    public void banUser(Long userId) {
+        checkAdminPermission();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setStatus(UserStatusEnum.BAN);
+        userRepository.save(user);
+    }
+
+    private UserDTO convertToDTO(User user) {
+        return new UserDTO(
+                user.getId(),
+                user.getFullName(),
+                user.getUserName(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                user.getStatus()
+        );
     }
 
 }

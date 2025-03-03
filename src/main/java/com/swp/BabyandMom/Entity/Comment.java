@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Comment {
@@ -25,5 +27,9 @@ public class Comment {
     private String content;
 
     private LocalDateTime createdAt;
-    private LocalDateTime updateddAt;
+    private LocalDateTime updatedAt;
+
+    @Column(nullable = false)
+    private Boolean isDeleted = false;
+
 }

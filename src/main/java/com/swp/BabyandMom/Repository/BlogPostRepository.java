@@ -10,4 +10,6 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, Long> {
     List<BlogPost> findByUser(User user);
     List<BlogPost> findByIsDeletedFalse();
     Optional<BlogPost> findByIdAndIsDeletedFalse(Long id);
+    List<BlogPost> findAll();
+
 }

@@ -1,5 +1,6 @@
 package com.swp.BabyandMom.Service;
 
+import com.swp.BabyandMom.DTO.BlogPostAdminResponseDTO;
 import com.swp.BabyandMom.DTO.BlogPostRequestDTO;
 import com.swp.BabyandMom.DTO.BlogPostResponseDTO;
 import com.swp.BabyandMom.Entity.BlogPost;
@@ -26,6 +27,13 @@ public class BlogPostService {
                 .collect(Collectors.toList());
     }
 
+    public List<BlogPostAdminResponseDTO> getAllPostsForAdmin() {
+        return repository.findAll().stream()
+                .map(this::convertToAdminDTO)
+                .collect(Collectors.toList());
+    }
+
+
     public BlogPostResponseDTO getPostById(Long id) {
         BlogPost post = repository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new RuntimeException("Blog post not found"));
@@ -51,10 +59,10 @@ public class BlogPostService {
     }
 
     public BlogPostResponseDTO updatePost(Long id, BlogPostRequestDTO request) {
-        BlogPost post = repository.findByIdAndIsDeletedFalse(id)
+        BlogPost post = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Blog post not found"));
 
-        validateOwnership(post.getUser());
+        validateOwnershipOrAdmin(post.getUser());
 
         post.setTitle(request.getTitle());
         post.setContent(request.getContent());
@@ -65,10 +73,10 @@ public class BlogPostService {
     }
 
     public void deletePost(Long id) {
-        BlogPost post = repository.findByIdAndIsDeletedFalse(id)
+        BlogPost post = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Blog post not found"));
 
-        validateOwnership(post.getUser());
+        validateOwnershipOrAdmin(post.getUser());
 
         post.setIsDeleted(true);
         post.setUpdatedAt(LocalDateTime.now());
@@ -76,9 +84,9 @@ public class BlogPostService {
         repository.save(post);
     }
 
-    private void validateOwnership(User postOwner) {
+    private void validateOwnershipOrAdmin(User postOwner) {
         User currentUser = userUtils.getCurrentAccount();
-        if (currentUser == null || !postOwner.getId().equals(currentUser.getId())) {
+        if (currentUser == null || (!postOwner.getId().equals(currentUser.getId()) && !currentUser.getRole().equals("ADMIN"))) {
             throw new AccessDeniedException("You do not have permission to modify this post");
         }
     }
@@ -93,4 +101,16 @@ public class BlogPostService {
                 post.getUpdatedAt()
         );
     }
+    private BlogPostAdminResponseDTO convertToAdminDTO(BlogPost post) {
+        return new BlogPostAdminResponseDTO(
+                post.getId(),
+                post.getUser().getId(),
+                post.getTitle(),
+                post.getContent(),
+                post.getIsDeleted(),
+                post.getCreatedAt(),
+                post.getUpdatedAt()
+        );
+    }
+
 }

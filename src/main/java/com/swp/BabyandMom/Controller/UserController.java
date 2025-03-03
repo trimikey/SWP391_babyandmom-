@@ -1,9 +1,6 @@
 package com.swp.BabyandMom.Controller;
 
-import com.swp.BabyandMom.DTO.ChangePasswordRequestDTO;
-import com.swp.BabyandMom.DTO.ChangePasswordResponseDTO;
-import com.swp.BabyandMom.DTO.ForgotPasswordRequestDTO;
-import com.swp.BabyandMom.DTO.ResetPasswordRequestDTO;
+import com.swp.BabyandMom.DTO.*;
 import com.swp.BabyandMom.Service.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +16,18 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/profile")
+    public ResponseEntity<GetProfileResponseDTO> getProfile() {
+        return userService.getProfile();
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @PutMapping("/update-profile")
+    public UpdateProfileResponseDTO updateProfile(@RequestBody UpdateProfileRequestDTO updateRequestDTO) throws Exception {
+        return userService.update(updateRequestDTO);
+    }
 
     @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/change")

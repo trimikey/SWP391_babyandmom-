@@ -4,12 +4,11 @@ import lombok.*;
 
 @Getter
 @Setter
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateProfileRequestDTO {
-    private String name;
+    private String fullName;
+    private String userName;
     private String email;
     private String phone;
-    private String password;
 }

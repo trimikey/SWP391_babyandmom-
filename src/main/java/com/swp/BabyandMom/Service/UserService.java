@@ -163,18 +163,25 @@ public class UserService implements UserDetailsService {
     public ResponseEntity<GetProfileResponseDTO> getProfile() {
         User account = userUtils.getCurrentAccount();
 
-        GetProfileResponseDTO getProfileResponse = new GetProfileResponseDTO(
-                account.getName(),
+        if (account == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        GetProfileResponseDTO response = new GetProfileResponseDTO(
+                account.getFullName(),
+                account.getUserName(),
                 account.getEmail(),
-                account.getPhone(),
-                account.getRole()
+                account.getPhoneNumber()
         );
-        return ResponseEntity.ok(getProfileResponse);
+
+        return ResponseEntity.ok(response);
     }
 
-    public UpdateProfileResponseDTO update(UpdateProfileRequestDTO updateRequestDTO) throws Exception {
 
-        User user = null;
+
+    public UpdateProfileResponseDTO update(UpdateProfileRequestDTO updateRequestDTO) throws Exception {
+        User user;
+
         try {
             user = userUtils.getCurrentAccount();
         } catch (Exception ex) {
@@ -185,13 +192,16 @@ public class UserService implements UserDetailsService {
 
         try {
             userRepository.save(user);
+
             return new UpdateProfileResponseDTO(
-                    user.getName(),
+                    user.getFullName(),
+                    user.getUserName(),
                     user.getEmail(),
-                    user.getPhoneNumber(),
-                    user.getPassword());
+                    user.getPhoneNumber()
+            );
+
         } catch (Exception ex) {
-            throw new Exception("Can not update");
+            throw new Exception("Cannot update profile");
         }
     }
 

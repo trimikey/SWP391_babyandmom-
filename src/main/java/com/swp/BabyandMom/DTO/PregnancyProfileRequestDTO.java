@@ -18,6 +18,7 @@ public class PregnancyProfileRequestDTO {
     private String babyGender;
 
     @NotNull(message = "Due date cannot be left blank")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime dueDate;
 
     @NotNull(message = "Current week cannot be left blank")

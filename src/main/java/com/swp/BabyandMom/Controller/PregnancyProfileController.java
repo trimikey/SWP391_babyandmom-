@@ -22,6 +22,11 @@ public class PregnancyProfileController {
         return service.getAllProfiles();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PregnancyProfileResponseDTO> getProfileById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getPregnancyProfileById(id));
+    }
+
     @PostMapping
     public PregnancyProfileResponseDTO createProfile(@RequestBody PregnancyProfileRequestDTO request) {
         return service.createProfile(request);

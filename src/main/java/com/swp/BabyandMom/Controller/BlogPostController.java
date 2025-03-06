@@ -5,6 +5,7 @@ import com.swp.BabyandMom.DTO.BlogPostRequestDTO;
 import com.swp.BabyandMom.DTO.BlogPostResponseDTO;
 import com.swp.BabyandMom.Service.BlogPostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,8 @@ import java.util.List;
 @RequestMapping("/api/blogs")
 @RequiredArgsConstructor
 public class BlogPostController {
-    private final BlogPostService service;
+    @Autowired
+    private  BlogPostService service;
 
     @GetMapping
     public ResponseEntity<List<BlogPostResponseDTO>> getAllPosts() {

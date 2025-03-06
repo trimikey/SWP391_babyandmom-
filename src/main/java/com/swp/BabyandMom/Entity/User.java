@@ -50,9 +50,28 @@ public class User implements UserDetails {
 
     private LocalDateTime resetCodeExpiration;
 
+    @Transient
+    private String refreshToken;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoleType role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Pregnancy_Profile> pregnancies;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Subscription> subscriptions;
 
 
 
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        if (this.role != null) authorities.add(new SimpleGrantedAuthority(this.role.toString()));
+        return authorities;
+    }
 
 
     // GETTER AND SETTER
@@ -191,26 +210,7 @@ public class User implements UserDetails {
         this.subscriptions = subscriptions;
     }
 
-    @Transient
-    private String refreshToken;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private RoleType role;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Pregnancy_Profile> pregnancies;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Subscription> subscriptions;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        if (this.role != null) authorities.add(new SimpleGrantedAuthority(this.role.toString()));
-        return authorities;
-    }
 
 
     @Transient

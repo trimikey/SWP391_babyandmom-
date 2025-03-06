@@ -14,6 +14,7 @@ import com.swp.BabyandMom.Repository.OrderRepository;
 import com.swp.BabyandMom.Repository.SubscriptionRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,9 @@ public class OrderService {
 
     @Autowired
     private SubscriptionRepository subscriptionRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     public OrderResponseDTO createOrder(OrderRequestDTO orderDTO) {
         User user = userService.getAccountByEmail(orderDTO.getBuyerEmail());

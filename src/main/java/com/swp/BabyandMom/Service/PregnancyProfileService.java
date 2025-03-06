@@ -29,6 +29,24 @@ public class PregnancyProfileService {
                 .collect(Collectors.toList());
     }
 
+    public PregnancyProfileResponseDTO getPregnancyProfileById(Long profileId) {
+        User currentUser = userUtils.getCurrentAccount();
+
+        Pregnancy_Profile profile = repository.findByIdAndUserAndIsDeletedFalse(profileId, currentUser)
+                .orElseThrow(() -> new RuntimeException("Pregnancy profile not found or access denied"));
+
+        return new PregnancyProfileResponseDTO(
+                profile.getId(),
+                profile.getBabyName(),
+                profile.getBabyGender(),
+                profile.getDueDate(),
+                profile.getCurrentWeek(),
+                profile.getLastPeriod(),
+                profile.getHeight()
+        );
+    }
+
+
 
     public PregnancyProfileResponseDTO createProfile(PregnancyProfileRequestDTO request) {
         User currentUser = userUtils.getCurrentAccount();

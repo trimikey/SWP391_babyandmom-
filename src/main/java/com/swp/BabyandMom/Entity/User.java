@@ -7,6 +7,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -60,11 +61,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Pregnancy_Profile> pregnancies;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonBackReference
+    @OneToMany(mappedBy = "user")
     private List<Subscription> subscriptions;
-
-
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -72,7 +71,6 @@ public class User implements UserDetails {
         if (this.role != null) authorities.add(new SimpleGrantedAuthority(this.role.toString()));
         return authorities;
     }
-
 
     // GETTER AND SETTER
 
@@ -192,8 +190,6 @@ public class User implements UserDetails {
         this.refreshToken = refreshToken;
     }
 
-
-
     public List<Pregnancy_Profile> getPregnancies() {
         return pregnancies;
     }
@@ -209,9 +205,6 @@ public class User implements UserDetails {
     public void setSubscriptions(List<Subscription> subscriptions) {
         this.subscriptions = subscriptions;
     }
-
-
-
 
     @Transient
     @Override
@@ -242,7 +235,6 @@ public class User implements UserDetails {
     public void setUserName(String userName) {
         this.userName = userName;
     }
-
 
     public String getUserName() {
         return userName;

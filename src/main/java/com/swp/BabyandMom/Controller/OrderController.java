@@ -1,5 +1,6 @@
 package com.swp.BabyandMom.Controller;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.swp.BabyandMom.DTO.OrderRequestDTO;
 import com.swp.BabyandMom.DTO.OrderResponseDTO;
 import com.swp.BabyandMom.Entity.Enum.MembershipType;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 
@@ -26,15 +28,10 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-//    // 1️⃣ API Tạo đơn hàng
-//    @PostMapping("/create")
-//    public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody OrderRequestDTO orderDTO) {
-//        OrderResponseDTO createdOrder = orderService.createOrder(orderDTO);
-//        return ResponseEntity.ok(createdOrder);
-//    }
 
 
-    // 1️⃣ API Tạo đơn hàng
+
+    //  API Tạo đơn hàng
     @PostMapping("/create")
     @Operation(summary = "Create Order by Membership Type")
     public ResponseEntity<OrderResponseDTO> createOrderByType(
@@ -45,7 +42,7 @@ public class OrderController {
 
 
 
-    // 2️⃣ API Lấy danh sách đơn hàng theo trạng thái
+    // API Lấy danh sách đơn hàng theo trạng thái
     @GetMapping("/status/{status}")
     public ResponseEntity<List<OrderResponseDTO>> getOrdersByStatus(@PathVariable OrderStatus status) {
         List<OrderResponseDTO> orders = orderService.getOrdersByStatus(status);
@@ -53,32 +50,49 @@ public class OrderController {
     }
 
 
-    // 3️⃣ API Thủ công cập nhật trạng thái đơn hàng hết hạn
+    // API Thủ công cập nhật trạng thái đơn hàng hết hạn
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/update-expired")
     public ResponseEntity<String> updateExpiredOrders() {
         orderService.updateExpiredOrders();
         return ResponseEntity.ok("Expired orders updated successfully");
     }
 
-    // 4️⃣ API Lấy danh sách tất cả đơn hàng
+    // API Lấy danh sách tất cả đơn hàng
+    @JsonIgnore
     @GetMapping("/all")
     public ResponseEntity<List<Order>> getAllOrders() {
         List<Order> orders = orderService.getALlOrders();
         return ResponseEntity.ok(orders);
     }
 
-    // 5️⃣ API Xem chi tiết đơn hàng theo ID
+    //  API Xem chi tiết đơn hàng theo ID
     @GetMapping("/{id}")
     public ResponseEntity<List<OrderResponseDTO>> getOrderById(@PathVariable Long id) {
         List<OrderResponseDTO> orders = orderService.getOrderById(id);
         return ResponseEntity.ok(orders);
     }
 
-    // 6️⃣ API Hủy đơn hàng theo ID
+    //  API Hủy đơn hàng theo ID
     @PutMapping("/cancel/{id}")
     public ResponseEntity<String> cancelOrder(@PathVariable Long id) {
         orderService.cancelOrder(id);
         return ResponseEntity.ok("Order cancelled successfully");
+    }
+
+    //  API Xóa đơn hàng theo ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteOrder(@PathVariable Long id) {
+        orderService.deleteOrder(id);
+        return ResponseEntity.ok("Order deleted successfully");
+    }
+
+    //  API Xóa hoàn toàn đơn hàng theo ID (chỉ dành cho ADMIN)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping("/remove/{id}")
+    public ResponseEntity<String> removeOrder(@PathVariable Long id) {
+        orderService.removeOrder(id);
+        return ResponseEntity.ok("Order removed permanently from database");
     }
 }
 

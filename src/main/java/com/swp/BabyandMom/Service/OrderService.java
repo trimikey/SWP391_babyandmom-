@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.swp.BabyandMom.Entity.Subscription;
-
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RequiredArgsConstructor
 @Service
@@ -48,7 +48,7 @@ public class OrderService {
 
     public OrderResponseDTO createOrder(OrderRequestDTO orderDTO) {
         User user = userService.getAccountByEmail(orderDTO.getBuyerEmail());
-        Membership_Package selectedPackage = membershipPackageRepository.findByType(orderDTO.getType())
+        Membership_Package  selectedPackage = membershipPackageRepository.findByType(orderDTO.getType())
                 .orElseThrow(() -> new RuntimeException("Package not found"));
 
         Subscription subscription = new Subscription();
@@ -61,7 +61,6 @@ public class OrderService {
 
         Order order = new Order();
         order.setUser(user);
-        order.setSelectedPackage(selectedPackage);
         order.setSubscription(subscription);
         order.setBuyerName(user.getName());
         order.setBuyerEmail(user.getEmail());
@@ -70,10 +69,10 @@ public class OrderService {
         order.setStatus(OrderStatus.PENDING);
         order.setCreatedAt(LocalDateTime.now());
         order.setStartDate(LocalDateTime.now());
-        order.setEndDate(LocalDateTime.now());
-        order.setIsDeleted(false);
+        order.setEndDate(LocalDateTime.now());       order.setIsDeleted(false);
 
         Order savedOrder = orderRepository.save(order);
+
         
         return new OrderResponseDTO(
             savedOrder.getId(),
@@ -82,9 +81,10 @@ public class OrderService {
             savedOrder.getBuyerPhone(),
             savedOrder.getTotalPrice(),
             savedOrder.getStatus(),
+            savedOrder.getCreatedAt(),
             savedOrder.getStartDate(),
             savedOrder.getEndDate(),
-            savedOrder.getSelectedPackage().getType().toString()
+            savedOrder.getSubscription().getMembershipPackage().getType().toString()
         );
     }
 
@@ -99,7 +99,8 @@ public class OrderService {
                         order.getStatus(),
                         order.getStartDate(),
                         order.getEndDate(),
-                        order.getSelectedPackage().getType().toString()
+                        order.getCreatedAt(),
+                        order.getSubscription().getMembershipPackage().getType().toString()
                 ))
                 .collect(Collectors.toList());
     }
@@ -119,7 +120,6 @@ public class OrderService {
 
         Order order = new Order();
         order.setUser(user);
-        order.setSelectedPackage(selectedPackage);
         order.setSubscription(subscription);
         order.setBuyerName(user.getName());
         order.setBuyerEmail(user.getEmail());
@@ -142,7 +142,8 @@ public class OrderService {
                 savedOrder.getStatus(),
                 savedOrder.getStartDate(),
                 savedOrder.getEndDate(),
-                savedOrder.getSelectedPackage().getType().toString()
+                savedOrder.getCreatedAt(),
+                savedOrder.getSubscription().getMembershipPackage().getType().toString()
         );
     }
 
@@ -223,12 +224,47 @@ public class OrderService {
                 order.getBuyerPhone(),
                 order.getTotalPrice(),
                 order.getStatus(),
+                order.getCreatedAt(),
                 order.getStartDate(),
                 order.getEndDate(),
-                order.getSelectedPackage().getType().toString()
+                order.getSubscription().getMembershipPackage().getType().toString()
             ))
             .collect(Collectors.toList());
             
     }
+
+   
+    public void deleteOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        
+        
+        if (order.getStatus() == OrderStatus.PENDING || order.getStatus() == OrderStatus.CANCELED) {
+            order.setIsDeleted(true);
+            orderRepository.save(order);
+        } else {
+            throw new RuntimeException("Cannot delete an active or expired order");
+        }
+    }
+
+    // Xóa hoàn toàn đơn hàng khỏi database (hard delete)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void removeOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        
+        // Chỉ admin mới có thể xóa hoàn toàn và chỉ xóa được đơn hàng đã bị soft delete
+        if (order.getIsDeleted()) {
+            // Xóa subscription liên quan
+            if (order.getSubscription() != null) {
+                subscriptionRepository.delete(order.getSubscription());
+            }
+            // Xóa order
+            orderRepository.delete(order);
+        } else {
+            throw new RuntimeException("Cannot remove order that has not been soft deleted first");
+        }
+    }
 }
+
 

@@ -6,6 +6,7 @@ import com.swp.BabyandMom.DTO.OrderResponseDTO;
 
 import com.swp.BabyandMom.Entity.Enum.MembershipType;
 import com.swp.BabyandMom.Entity.Enum.OrderStatus;
+import com.swp.BabyandMom.Entity.Enum.PaymentStatus;
 import com.swp.BabyandMom.Entity.Membership_Package;
 import com.swp.BabyandMom.Entity.Order;
 import com.swp.BabyandMom.Entity.User;
@@ -20,9 +21,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.swp.BabyandMom.Entity.Subscription;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @RequiredArgsConstructor
@@ -41,6 +44,15 @@ public class OrderService {
 
     @Autowired
     private SubscriptionRepository subscriptionRepository;
+
+    @Transactional
+    public void updatePaymentStatus(Long orderId, PaymentStatus status) {
+        orderRepository.findById(orderId).ifPresent(order -> {
+            order.setPaymentStatus(status);
+            orderRepository.save(order);
+        });
+    }
+
 
     public OrderResponseDTO createOrder(OrderRequestDTO orderDTO) {
         User user = userService.getAccountByEmail(orderDTO.getBuyerEmail());

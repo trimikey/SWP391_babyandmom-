@@ -69,7 +69,8 @@ public class OrderService {
         order.setStatus(OrderStatus.PENDING);
         order.setCreatedAt(LocalDateTime.now());
         order.setStartDate(LocalDateTime.now());
-        order.setEndDate(LocalDateTime.now());       order.setIsDeleted(false);
+        order.setEndDate(LocalDateTime.now());
+        order.setIsDeleted(false);
 
         Order savedOrder = orderRepository.save(order);
 
@@ -100,6 +101,7 @@ public class OrderService {
                         order.getStartDate(),
                         order.getEndDate(),
                         order.getCreatedAt(),
+
                         order.getSubscription().getMembershipPackage().getType().toString()
                 ))
                 .collect(Collectors.toList());

@@ -1,4 +1,5 @@
 package com.swp.BabyandMom.Entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.swp.BabyandMom.Entity.Enum.OrderStatus;
 import jakarta.persistence.*;
@@ -59,9 +60,4 @@ public class Order {
     @Column(nullable = false)
     private LocalDateTime endDate; // Ngày hết hạn gói
 
-//    @JsonBackReference
-//    @ManyToOne
-//    @JoinColumn(name = "package_id", nullable = false)
-//    @Column(nullable = false)
-//    private Membership_Package selectedPackage; // Gói mà user đã chọn
 }

@@ -7,15 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
-
-
-
 public class OrderResponseDTO {
     private Long id;
     private String buyerName;
@@ -23,6 +18,7 @@ public class OrderResponseDTO {
     private String buyerPhone;
     private Double totalPrice;
     private OrderStatus status;
+    private LocalDateTime createdDate;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private String packageType;

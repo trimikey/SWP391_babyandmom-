@@ -42,14 +42,13 @@ public class UserService implements UserDetailsService {
     private EmailService emailService;
 
     public User getAccountByEmail(String email) {
-        Optional<User> account = userRepository.findByEmail(email);
-        return account.orElse(null);
+        User account = userRepository.findByEmail(email);
+        return account;
     }
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username).orElseThrow(() ->
-                new UsernameNotFoundException("User not found")
-        );
+        return userRepository.findByEmail(username);
+
     }
 
     public ResponseEntity<LoginResponseDTO> checkLogin(LoginRequestDTO loginRequestDTO) {
@@ -79,8 +78,8 @@ public class UserService implements UserDetailsService {
                 );
             }
 
-            String accessToken = jwtService.generateToken(user.getEmail());
-            String refreshToken = jwtService.generateRefreshToken(user.getEmail());
+            String accessToken = jwtService.generateToken(user);
+
 
             // 🔥 Trả về Role chính xác
             RoleType role = user.getRole();
@@ -93,7 +92,7 @@ public class UserService implements UserDetailsService {
                     "Welcome " + user.getFullName() + " ! , you have successfully logged in!"
             );
 
-            return ResponseEntity.ok(new LoginResponseDTO("Login successful", "Success", accessToken, refreshToken, role));
+            return ResponseEntity.ok(new LoginResponseDTO("Login successful", "Success", accessToken, null, role));
 
         } catch (AuthAppException e) {
             logger.error("Authentication error: {}", e.getMessage());
@@ -140,9 +139,9 @@ public class UserService implements UserDetailsService {
 
             RegisterResponseDTO responseDTO = new RegisterResponseDTO(
                     savedUser.getId(),
-                    savedUser.getFullName(),
-                    savedUser.getPassword(),
+                    savedUser.getName(),
                     savedUser.getUserName(),
+                    savedUser.getPhoneNumber(),
                     savedUser.getEmail(),
                     "Registered successfully"
             );
@@ -259,49 +258,50 @@ public class UserService implements UserDetailsService {
 
 
 
-    public ResponseEntity<String> resetPassword(ResetPasswordRequestDTO resetPasswordRequestDTO){
+//    public ResponseEntity<String> resetPassword(ResetPasswordRequestDTO resetPasswordRequestDTO){
+//
+//
+//        User user = userRepository.findByEmail(resetPasswordRequestDTO.getEmail());
+//        if(user.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email does not exist !");
+//        if(!user.get().getResetCode().equals(resetPasswordRequestDTO.getCode()) || user.get().getResetCode()==null){
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid reset code !");
+//        }
+//        if(user.get().getResetCodeExpiration().isBefore(LocalDateTime.now())){
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Reset code has expired !");
+//        }
+//
+//        user.get().setPassword(passwordEncoder.encode(resetPasswordRequestDTO.getNewPassword()));
+//        user.get().setResetCode(null);
+//        user.get().setResetCodeExpiration(null);
+//        userRepository.save(user.get());
+//
+//        emailService.sendEmail(
+//                user.get().getEmail(),
+//                "Password Reset Successfully",
+//                "Your password has been reset successfully. If you did not perform this action, please contact us immediately."
+//        );
+//
+//        return ResponseEntity.ok("Password has been reset successfully !");
+//    }
 
-
-        Optional<User> user = userRepository.findByEmail(resetPasswordRequestDTO.getEmail());
-        if(user.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email does not exist !");
-        if(!user.get().getResetCode().equals(resetPasswordRequestDTO.getCode()) || user.get().getResetCode()==null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid reset code !");
-        }
-        if(user.get().getResetCodeExpiration().isBefore(LocalDateTime.now())){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Reset code has expired !");
-        }
-
-        user.get().setPassword(passwordEncoder.encode(resetPasswordRequestDTO.getNewPassword()));
-        user.get().setResetCode(null);
-        user.get().setResetCodeExpiration(null);
-        userRepository.save(user.get());
-
-        emailService.sendEmail(
-                user.get().getEmail(),
-                "Password Reset Successfully",
-                "Your password has been reset successfully. If you did not perform this action, please contact us immediately."
-        );
-
-        return ResponseEntity.ok("Password has been reset successfully !");
-    }
-
-    public ResponseEntity<String> forgotPassword (ForgotPasswordRequestDTO forgotPasswordRequestDTO){
-        Optional<User> user = userRepository.findByEmail(forgotPasswordRequestDTO.getEmail());
-
-        if(user.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email does not exist !");
-
-        String resetPasswordCode = generateCode();
-
-        emailService.sendEmail(forgotPasswordRequestDTO.getEmail(),"Forgot Password Code","Your reset code is: " + resetPasswordCode);
-
-        user.get().setResetCode(resetPasswordCode);
-        user.get().setResetCodeExpiration(LocalDateTime.now().plusMinutes(10)); // Code có hiệu lực trong 10 phút
-        userRepository.save(user.get());
-
-        String token = jwtService.generateToken(user.get().getEmail());
-
-        return ResponseEntity.ok("Reset code has been sent to your email! "+ ", " + "token" + token);
-    }
+//    public ResponseEntity<String> forgotPassword (ForgotPasswordRequestDTO forgotPasswordRequestDTO){
+//        User user = userRepository.findByEmail(forgotPasswordRequestDTO.getEmail());
+//
+//        if(user.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email does not exist !");
+//
+//        String resetPasswordCode = generateCode();
+//
+//        emailService.sendEmail(forgotPasswordRequestDTO.getEmail(),"Forgot Password Code","Your reset code is: " + resetPasswordCode);
+//
+//        user.get().setResetCode(resetPasswordCode);
+//        user.get().setResetCodeExpiration(LocalDateTime.now().plusMinutes(10)); // Code có hiệu lực trong 10 phút
+//        userRepository.save(user.get());
+//
+//
+//        String token = jwtService.generateToken(user);
+//
+//        return ResponseEntity.ok("Reset code has been sent to your email! "+ ", " + "token" + token);
+//    }
 
     private String generateCode(){
         Random random = new Random();

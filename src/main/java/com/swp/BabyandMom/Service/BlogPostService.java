@@ -8,6 +8,7 @@ import com.swp.BabyandMom.Entity.User;
 import com.swp.BabyandMom.Repository.BlogPostRepository;
 import com.swp.BabyandMom.Utils.UserUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +17,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+
 public class BlogPostService {
-    private final BlogPostRepository repository;
-    private final UserUtils userUtils;
+    @Autowired
+    private  BlogPostRepository repository;
+    @Autowired
+    private  UserUtils userUtils;
 
     public List<BlogPostResponseDTO> getAllPosts() {
         return repository.findByIsDeletedFalse().stream()

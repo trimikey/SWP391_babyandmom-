@@ -40,16 +40,16 @@ public class UserController {
     }
 
     // api dùng trước khi login, không cần authenticate
-    @PostMapping("/forgot")
-    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequestDTO requestDTO) {
-        return userService.forgotPassword(requestDTO);
-    }
+//    @PostMapping("/forgot")
+//    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequestDTO requestDTO) {
+//        return userService.forgotPassword(requestDTO);
+//    }
 
     // api dùng trước khi login, không cần authenticate
-    @PutMapping("/reset")
-    public ResponseEntity<String> resetPassowrd(@RequestBody ResetPasswordRequestDTO resetPasswordRequestDTO){
-        return userService.resetPassword(resetPasswordRequestDTO);
-    }
+//    @PutMapping("/reset")
+//    public ResponseEntity<String> resetPassowrd(@RequestBody ResetPasswordRequestDTO resetPasswordRequestDTO){
+//        return userService.resetPassword(resetPasswordRequestDTO);
+//    }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping

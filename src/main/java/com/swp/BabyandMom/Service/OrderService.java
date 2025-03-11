@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -266,6 +267,21 @@ public class OrderService {
         } else {
             throw new RuntimeException("Cannot remove order that has not been soft deleted first");
         }
+    }
+
+    // Logic trả về URL khi thanh toán thành công
+    public String getPaymentSuccessURL(Long orderId){
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        if(order.getStatus()==OrderStatus.PENDING){
+            order.setStatus(OrderStatus.PAID);
+        }else {
+            throw new RuntimeException("Payment not completed for this order");
+        }
+
+        return  "https://BabyAndMom.com/payment-success?orderId=" + orderId;
+
+
     }
 }
 

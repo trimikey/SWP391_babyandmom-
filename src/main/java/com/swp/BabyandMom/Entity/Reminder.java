@@ -1,8 +1,10 @@
 package com.swp.BabyandMom.Entity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.swp.BabyandMom.Entity.Enum.ReminderType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,8 +24,12 @@ public class Reminder {
     private ReminderType type;
 
     @Column(nullable = false)
-    private LocalDateTime reminderDateTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate reminderDateTime;
 
     private String title;
     private String description;
+
+    @Column(nullable = false)
+    private Boolean isDeleted = false;
 }

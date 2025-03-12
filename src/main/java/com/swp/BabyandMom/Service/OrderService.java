@@ -296,19 +296,6 @@ public class OrderService {
     }
 
     // Logic trả về URL khi thanh toán thành công
-    public String getPaymentSuccessURL(Long orderId){
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-        if(order.getStatus()==OrderStatus.PENDING){
-            order.setStatus(OrderStatus.PAID);
-        }else {
-            throw new RuntimeException("Payment not completed for this order");
-        }
-
-        return  "https://BabyAndMom.com/payment-success?orderId=" + orderId;
-
-
-    }
 }
 
 

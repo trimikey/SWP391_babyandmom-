@@ -99,5 +99,11 @@ public class OrderController {
         orderService.removeOrder(id);
         return ResponseEntity.ok("Order removed permanently from database");
     }
+
+    @GetMapping("/payment-success/{id}")
+    public ResponseEntity<String> successOrder(@PathVariable Long id){
+        orderService.getPaymentSuccessURL(id);
+        return ResponseEntity.ok("Order paid successfully");
+    }
 }
 

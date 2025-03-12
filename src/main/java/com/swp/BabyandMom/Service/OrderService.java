@@ -114,6 +114,7 @@ public class OrderService {
                         order.getStartDate(),
                         order.getEndDate(),
                         order.getCreatedAt(),
+
                         order.getSubscription().getMembershipPackage().getType().toString()
                 ))
                 .collect(Collectors.toList());
@@ -292,6 +293,21 @@ public class OrderService {
         } else {
             throw new RuntimeException("Cannot remove order that has not been soft deleted first");
         }
+    }
+
+    // Logic trả về URL khi thanh toán thành công
+    public String getPaymentSuccessURL(Long orderId){
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        if(order.getStatus()==OrderStatus.PENDING){
+            order.setStatus(OrderStatus.PAID);
+        }else {
+            throw new RuntimeException("Payment not completed for this order");
+        }
+
+        return  "https://BabyAndMom.com/payment-success?orderId=" + orderId;
+
+
     }
 }
 

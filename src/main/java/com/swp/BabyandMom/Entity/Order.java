@@ -1,7 +1,8 @@
 package com.swp.BabyandMom.Entity;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.swp.BabyandMom.Entity.Enum.OrderStatus;
+import com.swp.BabyandMom.Entity.Enum.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -60,4 +61,25 @@ public class Order {
     @Column(nullable = false)
     private LocalDateTime endDate; // Ngày hết hạn gói
 
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
+
+    // Getters và Setters
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+    public void getPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+
+//    @JsonBackReference
+//    @ManyToOne
+//    @JoinColumn(name = "package_id", nullable = false)
+//    @Column(nullable = false)
+//    private Membership_Package selectedPackage; // Gói mà user đã chọn
 }

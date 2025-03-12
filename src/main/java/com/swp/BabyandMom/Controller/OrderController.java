@@ -40,6 +40,11 @@ public class OrderController {
         return ResponseEntity.ok(orderService.createOrdersByType(membershipType));
     }
 
+    @GetMapping("/payment-success/{id}")
+    public ResponseEntity<String> successOrder(@PathVariable Long id){
+        orderService.getPaymentSuccessURL(id);
+        return ResponseEntity.ok("Order paid successfully");
+    }
 
 
     // API Lấy danh sách đơn hàng theo trạng thái

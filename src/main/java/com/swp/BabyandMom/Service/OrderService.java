@@ -6,6 +6,7 @@ import com.swp.BabyandMom.DTO.OrderResponseDTO;
 
 import com.swp.BabyandMom.Entity.Enum.MembershipType;
 import com.swp.BabyandMom.Entity.Enum.OrderStatus;
+import com.swp.BabyandMom.Entity.Enum.PaymentStatus;
 import com.swp.BabyandMom.Entity.Membership_Package;
 import com.swp.BabyandMom.Entity.Order;
 import com.swp.BabyandMom.Entity.User;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 import com.swp.BabyandMom.Entity.Subscription;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -45,6 +47,16 @@ public class OrderService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+
+    @Transactional
+    public void updatePaymentStatus(Long orderId, PaymentStatus status) {
+        orderRepository.findById(orderId).ifPresent(order -> {
+            order.setPaymentStatus(status);
+            orderRepository.save(order);
+        });
+    }
+
 
     public OrderResponseDTO createOrder(OrderRequestDTO orderDTO) {
         User user = userService.getAccountByEmail(orderDTO.getBuyerEmail());

@@ -1,5 +1,6 @@
 package com.swp.BabyandMom.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.swp.BabyandMom.Entity.Enum.OrderStatus;
 import com.swp.BabyandMom.Entity.Enum.PaymentStatus;
 import jakarta.persistence.*;

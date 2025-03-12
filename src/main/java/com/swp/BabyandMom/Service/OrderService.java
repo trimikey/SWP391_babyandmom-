@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -81,7 +82,8 @@ public class OrderService {
         order.setStatus(OrderStatus.PENDING);
         order.setCreatedAt(LocalDateTime.now());
         order.setStartDate(LocalDateTime.now());
-        order.setEndDate(LocalDateTime.now());       order.setIsDeleted(false);
+        order.setEndDate(LocalDateTime.now());
+        order.setIsDeleted(false);
 
         Order savedOrder = orderRepository.save(order);
 
@@ -115,6 +117,20 @@ public class OrderService {
                         order.getSubscription().getMembershipPackage().getType().toString()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    public String getPaymentSuccessURL(Long orderId){
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        if(order.getStatus()==OrderStatus.PENDING){
+            order.setStatus(OrderStatus.PAID);
+        }else {
+            throw new RuntimeException("Payment not completed for this order");
+        }
+
+        return  "https://BabyAndMom.com/payment-success?orderId=" + orderId;
+
+
     }
 
     public OrderResponseDTO createOrdersByType(MembershipType membershipType) {

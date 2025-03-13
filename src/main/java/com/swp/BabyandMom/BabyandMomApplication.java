@@ -9,21 +9,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
 @OpenAPIDefinition(
-    info = @Info(
-        title = "Baby and Mom API",
-        version = "1.0",
-        description = "API Documentation for Baby and Mom Application"
-    )
+		info = @Info(
+				title = "Baby and Mom API",
+				version = "1.0",
+				description = "API Documentation for Baby and Mom Application"
+		)
 )
 @SecurityScheme(
-    name = "bearerAuth",
-    type = SecuritySchemeType.HTTP,
-    scheme = "bearer",
-    bearerFormat = "JWT",
-    in = SecuritySchemeIn.HEADER
+		name = "bearerAuth",
+		type = SecuritySchemeType.HTTP,
+		scheme = "bearer",
+		bearerFormat = "JWT",
+		in = SecuritySchemeIn.HEADER
 )
 public class BabyandMomApplication {
 	private static final Logger logger = LoggerFactory.getLogger(BabyandMomApplication.class);

@@ -49,19 +49,20 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)  throws Exception {
-        return http
-                .cors().and() //lỗi version quá mới (ko sao kệ)
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                        .requestMatchers("/**").permitAll() // /** các đường dẫn sau dấu / cho permit All
-                        .anyRequest().authenticated()
-                )
-                .userDetailsService(userService)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http)  throws Exception {
+            return http
+                    .cors().and() //lỗi version quá mới (ko sao kệ)
+                    .csrf(AbstractHttpConfigurer::disable)
+                    .authorizeHttpRequests(auth -> auth
+                            .requestMatchers("/api/order/cancel/**").permitAll()
+                            .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                            .requestMatchers("/**").permitAll()
+                            .anyRequest().authenticated()
+                    )
+                    .userDetailsService(userService)
+                    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                    .build();
+        }
 }

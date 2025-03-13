@@ -44,7 +44,9 @@
                 "/v3/api-docs/**",
                 "/swagger-resources/**",
                 "/api/login",
-                "/api/register"
+                "/api/register",
+                "/api/order/cancel/**",
+                "/api/order//payment-success/**"
         );
 
         //nhận bt api nào là api cần phân quyền

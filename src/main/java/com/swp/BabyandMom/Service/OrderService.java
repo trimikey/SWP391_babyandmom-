@@ -54,9 +54,18 @@ public class OrderService {
     public void updatePaymentStatus(Long orderId, PaymentStatus status) {
         orderRepository.findById(orderId).ifPresent(order -> {
             order.setPaymentStatus(status);
+
+            if (status == PaymentStatus.COMPLETED) {
+                order.setStatus(OrderStatus.PAID);
+            }
+            else if (status == PaymentStatus.FAILED) {
+                order.setStatus(OrderStatus.CANCELED);
+            }
+
             orderRepository.save(order);
         });
     }
+
 
 
     public OrderResponseDTO createOrder(OrderRequestDTO orderDTO) {
@@ -120,19 +129,39 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    public String getPaymentSuccessURL(Long orderId){
+    public String getPaymentSuccessURL(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
-        if(order.getStatus()==OrderStatus.PENDING){
+
+        if (order.getStatus() == OrderStatus.PENDING) {
             order.setStatus(OrderStatus.PAID);
-        }else {
+            order.setPaymentStatus(PaymentStatus.COMPLETED);
+            orderRepository.save(order);
+        } else if (order.getStatus() == OrderStatus.PAID && order.getPaymentStatus() == PaymentStatus.COMPLETED) {
+            return "https://BabyAndMom.com/payment-success?orderId=" + orderId;
+        } else {
             throw new RuntimeException("Payment not completed for this order");
         }
 
-        return  "https://BabyAndMom.com/payment-success?orderId=" + orderId;
-
-
+        return "https://BabyAndMom.com/payment-success?orderId=" + orderId;
     }
+
+
+
+    @Transactional
+    public void cancelOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException(" Order not found"));
+
+        if (order.getStatus() == OrderStatus.PENDING) {
+            order.setStatus(OrderStatus.CANCELED);
+            order.setPaymentStatus(PaymentStatus.FAILED);
+            orderRepository.save(order);
+        } else {
+            throw new RuntimeException(" Cannot cancel an active or expired order");
+        }
+    }
+
 
     public OrderResponseDTO createOrdersByType(MembershipType membershipType) {
         String loggedInEmail = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -179,17 +208,6 @@ public class OrderService {
 
     //    Nếu người dùng chưa thanh toán (PENDING), họ có thể hủy Order.
     //    Nếu Order đã ACTIVE, không thể hủy.
-
-    public void cancelOrder(Long orderId){
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-        if(order.getStatus() == OrderStatus.PENDING){
-            order.setStatus(OrderStatus.CANCELED);
-            orderRepository.save(order);
-        }else {
-            throw new RuntimeException("Cannot cancel an active or expired order");
-        }
-    }
 
     // Cập nhật trạng thái đơn hàng khi thanh toán thành công
 

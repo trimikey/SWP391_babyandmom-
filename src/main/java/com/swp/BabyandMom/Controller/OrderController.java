@@ -5,7 +5,9 @@ import com.swp.BabyandMom.DTO.OrderRequestDTO;
 import com.swp.BabyandMom.DTO.OrderResponseDTO;
 import com.swp.BabyandMom.Entity.Enum.MembershipType;
 import com.swp.BabyandMom.Entity.Enum.OrderStatus;
+import com.swp.BabyandMom.Entity.Enum.PaymentStatus;
 import com.swp.BabyandMom.Entity.Order;
+import com.swp.BabyandMom.Repository.OrderRepository;
 import com.swp.BabyandMom.Service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,6 +31,8 @@ public class OrderController {
     private OrderService orderService;
 
 
+    @Autowired
+    private OrderRepository orderRepository;
 
 
     //  API Tạo đơn hàng
@@ -39,21 +43,6 @@ public class OrderController {
             @RequestParam MembershipType membershipType) {
         return ResponseEntity.ok(orderService.createOrdersByType(membershipType));
     }
-
-    @GetMapping("/payment-success/{id}")
-    public ResponseEntity<String> successOrder(@PathVariable Long id){
-        orderService.getPaymentSuccessURL(id);
-        return ResponseEntity.ok("Order paid successfully");
-    }
-
-
-    // API Lấy danh sách đơn hàng theo trạng thái
-    @GetMapping("/status/{status}")
-    public ResponseEntity<List<OrderResponseDTO>> getOrdersByStatus(@PathVariable OrderStatus status) {
-        List<OrderResponseDTO> orders = orderService.getOrdersByStatus(status);
-        return ResponseEntity.ok(orders);
-    }
-
 
     // API Thủ công cập nhật trạng thái đơn hàng hết hạn
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -82,8 +71,26 @@ public class OrderController {
     @PutMapping("/cancel/{id}")
     public ResponseEntity<String> cancelOrder(@PathVariable Long id) {
         orderService.cancelOrder(id);
+        orderRepository.findById(id).get().setPaymentStatus(PaymentStatus.FAILED);
         return ResponseEntity.ok("Order cancelled successfully");
     }
+
+    @GetMapping("/payment-success/{id}")
+    public ResponseEntity<String> successOrder(@PathVariable Long id){
+        orderService.getPaymentSuccessURL(id);
+        orderRepository.findById(id).get().setPaymentStatus(PaymentStatus.COMPLETED);
+        return ResponseEntity.ok("Order paid successfully");
+    }
+
+
+
+    // API Lấy danh sách đơn hàng theo trạng thái
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<OrderResponseDTO>> getOrdersByStatus(@PathVariable OrderStatus status) {
+        List<OrderResponseDTO> orders = orderService.getOrdersByStatus(status);
+        return ResponseEntity.ok(orders);
+    }
+
 
     //  API Xóa đơn hàng theo ID
     @DeleteMapping("/{id}")

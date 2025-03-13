@@ -4,6 +4,7 @@ import com.swp.BabyandMom.DTO.OrderRequestDTO;
 import com.swp.BabyandMom.DTO.OrderResponseDTO;
 
 
+import com.swp.BabyandMom.DTO.OrderResponseDTO2;
 import com.swp.BabyandMom.Entity.Enum.MembershipType;
 import com.swp.BabyandMom.Entity.Enum.OrderStatus;
 import com.swp.BabyandMom.Entity.Enum.PaymentStatus;
@@ -262,25 +263,26 @@ public class OrderService {
     }
 
 
-    public List<OrderResponseDTO> getOrderById(Long id) {
+    public List<OrderResponseDTO2> getOrderById(Long id) {
         return orderRepository.findById(id).stream()
-            .map(order -> new OrderResponseDTO(
-                order.getId(),
-                order.getBuyerName(),
-                order.getBuyerEmail(),
-                order.getBuyerPhone(),
-                order.getTotalPrice(),
-                order.getStatus(),
-                order.getCreatedAt(),
-                order.getStartDate(),
-                order.getEndDate(),
-                order.getSubscription().getMembershipPackage().getType().toString()
-            ))
-            .collect(Collectors.toList());
-            
+                .map(order -> new OrderResponseDTO2(
+                        order.getId(),
+                        order.getBuyerName(),
+                        order.getBuyerEmail(),
+                        order.getBuyerPhone(),
+                        order.getTotalPrice(),
+                        order.getStatus(),
+                        order.getCreatedAt(),
+                        order.getStartDate(),
+                        order.getEndDate(),
+                        order.getSubscription().getMembershipPackage().getType().toString(),
+                        order.getUser().getId()
+                ))
+                .collect(Collectors.toList());
     }
 
-   
+
+
     public void deleteOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
@@ -313,7 +315,6 @@ public class OrderService {
         }
     }
 
-    // Logic trả về URL khi thanh toán thành công
 }
 
 

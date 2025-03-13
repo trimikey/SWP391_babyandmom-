@@ -1,18 +1,18 @@
 package com.swp.BabyandMom.DTO;
 
-import java.time.LocalDateTime;
 import com.swp.BabyandMom.Entity.Enum.OrderStatus;
-import com.swp.BabyandMom.Entity.Membership_Package;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderResponseDTO {
+public class OrderResponseDTO2 {
     private Long id;
     private String buyerName;
     private String buyerEmail;
@@ -23,4 +23,5 @@ public class OrderResponseDTO {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private String packageType;
+    private Long userId;
 }

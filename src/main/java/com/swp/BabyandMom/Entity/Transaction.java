@@ -1,7 +1,8 @@
 package com.swp.BabyandMom.Entity;
+import com.swp.BabyandMom.Entity.Enum.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.*;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,10 +15,12 @@ public class Transaction {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @OneToOne
+    @JsonIgnore
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
@@ -30,8 +33,9 @@ public class Transaction {
     @Column(nullable = false)
     private String paymentMethod;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status;
+    private TransactionStatus status;
 
     @Column(nullable = false)
     private Boolean isDeleted = false;

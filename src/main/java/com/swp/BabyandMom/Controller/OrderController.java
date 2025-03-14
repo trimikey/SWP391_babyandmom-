@@ -7,9 +7,11 @@ import com.swp.BabyandMom.DTO.OrderResponseDTO2;
 import com.swp.BabyandMom.Entity.Enum.MembershipType;
 import com.swp.BabyandMom.Entity.Enum.OrderStatus;
 import com.swp.BabyandMom.Entity.Enum.PaymentStatus;
+import com.swp.BabyandMom.Entity.Enum.TransactionStatus;
 import com.swp.BabyandMom.Entity.Order;
 import com.swp.BabyandMom.Repository.OrderRepository;
 import com.swp.BabyandMom.Service.OrderService;
+import com.swp.BabyandMom.Service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -31,10 +33,11 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private TransactionService transactionService;
 
     //  API Tạo đơn hàng
     @PostMapping("/create")
@@ -71,19 +74,34 @@ public class OrderController {
     //  API Hủy đơn hàng theo ID
     @GetMapping("/cancel/{id}")
     public ResponseEntity<String> cancelOrder(@PathVariable Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        
         orderService.cancelOrder(id);
-        orderRepository.findById(id).get().setPaymentStatus(PaymentStatus.FAILED);
+        order.setPaymentStatus(PaymentStatus.FAILED);
+        orderRepository.save(order);
+        
+        // Create failed transaction record
+        transactionService.createTransaction(order, "PayOS", TransactionStatus.FAILED);
+        
         return ResponseEntity.ok("Order cancelled successfully");
     }
 
     @GetMapping("/payment-success/{id}")
-    public ResponseEntity<String> successOrder(@PathVariable Long id){
+    public ResponseEntity<String> successOrder(@PathVariable Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        
         orderService.getPaymentSuccessURL(id);
-        orderRepository.findById(id).get().setPaymentStatus(PaymentStatus.COMPLETED);
+        order.setPaymentStatus(PaymentStatus.COMPLETED);
+        order.setStatus(OrderStatus.PAID);
+        orderRepository.save(order);
+        
+        // Create successful transaction record
+        transactionService.createTransaction(order, "PayOS", TransactionStatus.COMPLETED);
+        
         return ResponseEntity.ok("Order paid successfully");
     }
-
-
 
     // API Lấy danh sách đơn hàng theo trạng thái
     @GetMapping("/status/{status}")
@@ -91,7 +109,6 @@ public class OrderController {
         List<OrderResponseDTO> orders = orderService.getOrdersByStatus(status);
         return ResponseEntity.ok(orders);
     }
-
 
     //  API Xóa đơn hàng theo ID
     @DeleteMapping("/{id}")

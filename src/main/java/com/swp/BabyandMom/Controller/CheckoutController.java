@@ -4,6 +4,7 @@ import com.swp.BabyandMom.DTO.OrderResponseDTO2;
 import com.swp.BabyandMom.Entity.Enum.PaymentStatus;
 import com.swp.BabyandMom.Entity.User;
 import com.swp.BabyandMom.Service.OrderService;
+import com.swp.BabyandMom.Service.TransactionService;
 import com.swp.BabyandMom.Utils.UserUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class CheckoutController {
     private final PayOS payOS;
     private final OrderService orderService;
     private final UserUtils userUtils;
+    private final TransactionService transactionService;
 
     @PostMapping(value = "/checkout", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> checkout(

@@ -17,11 +17,15 @@ import java.util.Map;
 public class GrowthRecordController {
     private final GrowthRecordService growthRecordService;
 
-    @GetMapping("/current")
-    public ResponseEntity<List<GrowthRecordResponseDTO>> getAllGrowthRecords(@RequestBody Map<String, Long> requestBody) {
-        Long profileId = requestBody.get("profileId");
-        return ResponseEntity.ok(growthRecordService.getGrowthRecordsByCurrentUser(profileId));
-    }
+//    @GetMapping("/current")
+//    public ResponseEntity<List<GrowthRecordResponseDTO>> getAllGrowthRecords(@RequestBody Map<String, Long> requestBody) {
+//        Long profileId = requestBody.get("profileId");
+//        return ResponseEntity.ok(growthRecordService.getGrowthRecordsByCurrentUser(profileId));
+//    }
+@GetMapping("/current")
+public ResponseEntity<List<GrowthRecordResponseDTO>> getAllGrowthRecords(@RequestParam Long profileId) {
+    return ResponseEntity.ok(growthRecordService.getGrowthRecordsByCurrentUser(profileId));
+}
 
 
 

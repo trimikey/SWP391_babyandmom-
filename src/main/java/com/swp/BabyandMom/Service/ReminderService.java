@@ -23,18 +23,33 @@ public class ReminderService {
     private final UserUtils userUtils;
     private final PregnancyRepository pregnancyRepository;
 
-    public List<ReminderResponseDTO> getAllReminders() {
+//    public List<ReminderResponseDTO> getAllReminders() {
+//        return repository.findByIsDeletedFalse().stream()
+//                .map(this::convertToDTO)
+//                .collect(Collectors.toList());
+//    }
+public List<ReminderResponseDTO> getAllReminders() {
+    User currentUser = userUtils.getCurrentAccount();
+
+    // Nếu là ADMIN thì có thể xem tất cả
+    if (currentUser.getRole().equals(RoleType.ADMIN)) {
         return repository.findByIsDeletedFalse().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    // Người dùng thường chỉ xem được lời nhắc của mình
+    return repository.findByPregnancy_UserAndIsDeletedFalse(currentUser).stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+}
 
     public ReminderResponseDTO getReminderById(Long id) {
         Reminder reminder = repository.findByIdAndIsDeletedFalse(id);
         if (reminder == null) {
             throw new RuntimeException("Reminder not found or has been deleted");
         }
-        return convertToDTO(reminder);
+        return convertToDTO (reminder);
     }
 
 

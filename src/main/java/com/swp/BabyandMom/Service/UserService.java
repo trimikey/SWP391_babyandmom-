@@ -288,30 +288,53 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.ok("Password has been reset successfully !");
     }
 
-    public ResponseEntity<String> forgotPassword(ForgotPasswordRequestDTO forgotPasswordRequestDTO, HttpSession session) {
-        String email = forgotPasswordRequestDTO.getEmail();
-        Optional<User> userOptional = userRepository.findByEmail(email);
+//    public ResponseEntity<String> forgotPassword(ForgotPasswordRequestDTO forgotPasswordRequestDTO, HttpSession session) {
+//        String email = forgotPasswordRequestDTO.getEmail();
+//        Optional<User> userOptional = userRepository.findByEmail(email);
+//
+//        if (userOptional.isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email does not exist!");
+//        }
+//        String resetPasswordCode = generateCode();
+//
+//        emailService.sendEmail(email, "Forgot Password Code", "Your reset code is: " + resetPasswordCode);
+//
+//
+//        session.setAttribute("forgotEmail", email);
+//        session.setAttribute("resetCode", resetPasswordCode);
+//        session.setAttribute("resetCodeExpiration", LocalDateTime.now().plusMinutes(10));
+//
+//        // Update user reset code in database
+//        User user = userOptional.get();
+//        user.setResetCode(resetPasswordCode);
+//        user.setResetCodeExpiration(LocalDateTime.now().plusMinutes(10));
+//        userRepository.save(user);
+//
+//        return ResponseEntity.ok("Reset code has been sent to your email!");
+//    }
+public ResponseEntity<String> forgotPassword(ForgotPasswordRequestDTO forgotPasswordRequestDTO, HttpSession session) {
+    String email = forgotPasswordRequestDTO.getEmail();
+    Optional<User> userOptional = userRepository.findByEmail(email);
 
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email does not exist!");
-        }
-        String resetPasswordCode = generateCode();
-
-        emailService.sendEmail(email, "Forgot Password Code", "Your reset code is: " + resetPasswordCode);
-
-
-        session.setAttribute("forgotEmail", email);
-        session.setAttribute("resetCode", resetPasswordCode);
-        session.setAttribute("resetCodeExpiration", LocalDateTime.now().plusMinutes(10));
-
-        // Update user reset code in database
-        User user = userOptional.get();
-        user.setResetCode(resetPasswordCode);
-        user.setResetCodeExpiration(LocalDateTime.now().plusMinutes(10));
-        userRepository.save(user);
-
-        return ResponseEntity.ok("Reset code has been sent to your email!");
+    if (userOptional.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email does not exist!");
     }
+    String resetPasswordCode = generateCode();
+
+    emailService.sendEmail(email, "Forgot Password Code", "Your reset code is: " + resetPasswordCode);
+
+    session.setAttribute("forgotEmail", email);
+    session.setAttribute("resetCode", resetPasswordCode);
+    session.setAttribute("resetCodeExpiration", LocalDateTime.now().plusMinutes(10));
+
+    // Update user reset code in database
+    User user = userOptional.get();
+    user.setResetCode(resetPasswordCode);
+    user.setResetCodeExpiration(LocalDateTime.now().plusMinutes(10));
+    userRepository.save(user);
+
+    return ResponseEntity.ok("Reset code has been sent to your email!");
+}
 
 
     private String generateCode(){

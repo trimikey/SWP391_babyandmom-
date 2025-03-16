@@ -283,18 +283,29 @@ public class OrderService {
 
 
 
-    public void deleteOrder(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-        
-        
-        if (order.getStatus() == OrderStatus.PENDING || order.getStatus() == OrderStatus.CANCELED) {
-            order.setIsDeleted(true);
-            orderRepository.save(order);
-        } else {
-            throw new RuntimeException("Cannot delete an active or expired order");
-        }
+//    public void deleteOrder(Long orderId) {
+//        Order order = orderRepository.findById(orderId)
+//                .orElseThrow(() -> new RuntimeException("Order not found"));
+//
+//
+//        if (order.getStatus() == OrderStatus.PENDING || order.getStatus() == OrderStatus.CANCELED) {
+//            order.setIsDeleted(true);
+//            orderRepository.save(order);
+//        } else {
+//            throw new RuntimeException("Cannot delete an active or expired order");
+//        }
+//    }
+public void deleteOrder(Long orderId) {
+    Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("Order not found"));
+
+    if (order.getStatus() == OrderStatus.PENDING || order.getStatus() == OrderStatus.CANCELED || order.getStatus() == OrderStatus.PAID) {
+        order.setIsDeleted(true);
+        orderRepository.save(order);
+    } else {
+        throw new RuntimeException("Cannot delete an active or expired order");
     }
+}
 
     // Xóa hoàn toàn đơn hàng khỏi database (hard delete)
     @PreAuthorize("hasAuthority('ADMIN')")

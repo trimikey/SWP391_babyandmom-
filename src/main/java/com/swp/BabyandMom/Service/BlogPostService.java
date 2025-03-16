@@ -4,6 +4,7 @@ import com.swp.BabyandMom.DTO.BlogPostAdminResponseDTO;
 import com.swp.BabyandMom.DTO.BlogPostRequestDTO;
 import com.swp.BabyandMom.DTO.BlogPostResponseDTO;
 import com.swp.BabyandMom.Entity.BlogPost;
+import com.swp.BabyandMom.Entity.Enum.RoleType;
 import com.swp.BabyandMom.Entity.User;
 import com.swp.BabyandMom.Repository.BlogPostRepository;
 import com.swp.BabyandMom.Utils.UserUtils;
@@ -89,7 +90,9 @@ public class BlogPostService {
 
     private void validateOwnershipOrAdmin(User postOwner) {
         User currentUser = userUtils.getCurrentAccount();
-        if (currentUser == null || (!postOwner.getId().equals(currentUser.getId()) && !currentUser.getRole().equals("ADMIN"))) {
+        if (currentUser == null ||
+                (!postOwner.getId().equals(currentUser.getId()) &&
+                        !currentUser.getRole().equals(RoleType.ADMIN))) {
             throw new AccessDeniedException("You do not have permission to modify this post");
         }
     }

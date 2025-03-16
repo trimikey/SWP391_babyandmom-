@@ -9,6 +9,7 @@ import com.swp.BabyandMom.ExceptionHandler.NotLoginException;
 import com.swp.BabyandMom.Repository.UserRepository;
 import com.swp.BabyandMom.Utils.UpdateUtils;
 import com.swp.BabyandMom.Utils.UserUtils;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,15 +42,18 @@ public class UserService implements UserDetailsService {
     @Autowired
     private EmailService emailService;
 
+    private ForgotPasswordRequestDTO forgotPasswordRequestDTO;
+
     public User getAccountByEmail(String email) {
-        User account = userRepository.findByEmail(email);
-        return account;
+        Optional<User> account = userRepository.findByEmail(email);
+        return account.orElse(null);
     }
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username);
-
+        return userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
     }
+
 
     public ResponseEntity<LoginResponseDTO> checkLogin(LoginRequestDTO loginRequestDTO) {
         logger.info("Received login request for email: {}", loginRequestDTO.getEmail());
@@ -258,50 +262,57 @@ public class UserService implements UserDetailsService {
 
 
 
-//    public ResponseEntity<String> resetPassword(ResetPasswordRequestDTO resetPasswordRequestDTO){
-//
-//
-//        User user = userRepository.findByEmail(resetPasswordRequestDTO.getEmail());
-//        if(user.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email does not exist !");
-//        if(!user.get().getResetCode().equals(resetPasswordRequestDTO.getCode()) || user.get().getResetCode()==null){
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid reset code !");
-//        }
-//        if(user.get().getResetCodeExpiration().isBefore(LocalDateTime.now())){
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Reset code has expired !");
-//        }
-//
-//        user.get().setPassword(passwordEncoder.encode(resetPasswordRequestDTO.getNewPassword()));
-//        user.get().setResetCode(null);
-//        user.get().setResetCodeExpiration(null);
-//        userRepository.save(user.get());
-//
-//        emailService.sendEmail(
-//                user.get().getEmail(),
-//                "Password Reset Successfully",
-//                "Your password has been reset successfully. If you did not perform this action, please contact us immediately."
-//        );
-//
-//        return ResponseEntity.ok("Password has been reset successfully !");
-//    }
+    public ResponseEntity<String> resetPassword(ResetPasswordRequestDTO resetPasswordRequestDTO, HttpSession session){
 
-//    public ResponseEntity<String> forgotPassword (ForgotPasswordRequestDTO forgotPasswordRequestDTO){
-//        User user = userRepository.findByEmail(forgotPasswordRequestDTO.getEmail());
-//
-//        if(user.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email does not exist !");
-//
-//        String resetPasswordCode = generateCode();
-//
-//        emailService.sendEmail(forgotPasswordRequestDTO.getEmail(),"Forgot Password Code","Your reset code is: " + resetPasswordCode);
-//
-//        user.get().setResetCode(resetPasswordCode);
-//        user.get().setResetCodeExpiration(LocalDateTime.now().plusMinutes(10)); // Code có hiệu lực trong 10 phút
-//        userRepository.save(user.get());
-//
-//
-//        String token = jwtService.generateToken(user);
-//
-//        return ResponseEntity.ok("Reset code has been sent to your email! "+ ", " + "token" + token);
-//    }
+        String email = (String) session.getAttribute("forgotEmail");
+        Optional<User> user = userRepository.findByEmail(email);
+        if(user.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email does not exist !");
+        if(!user.get().getResetCode().equals(resetPasswordRequestDTO.getCode()) || user.get().getResetCode()==null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid reset code !");
+        }
+        if(user.get().getResetCodeExpiration().isBefore(LocalDateTime.now())){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Reset code has expired !");
+        }
+
+        user.get().setPassword(passwordEncoder.encode(resetPasswordRequestDTO.getNewPassword()));
+        user.get().setResetCode(null);
+        user.get().setResetCodeExpiration(null);
+        userRepository.save(user.get());
+
+        emailService.sendEmail(
+                user.get().getEmail(),
+                "Password Reset Successfully",
+                "Your password has been reset successfully. If you did not perform this action, please contact us immediately."
+        );
+
+        return ResponseEntity.ok("Password has been reset successfully !");
+    }
+
+    public ResponseEntity<String> forgotPassword(ForgotPasswordRequestDTO forgotPasswordRequestDTO, HttpSession session) {
+        String email = forgotPasswordRequestDTO.getEmail();
+        Optional<User> userOptional = userRepository.findByEmail(email);
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email does not exist!");
+        }
+        String resetPasswordCode = generateCode();
+
+        emailService.sendEmail(email, "Forgot Password Code", "Your reset code is: " + resetPasswordCode);
+
+
+        session.setAttribute("forgotEmail", email);
+        session.setAttribute("resetCode", resetPasswordCode);
+        session.setAttribute("resetCodeExpiration", LocalDateTime.now().plusMinutes(10));
+
+        // Update user reset code in database
+        User user = userOptional.get();
+        user.setResetCode(resetPasswordCode);
+        user.setResetCodeExpiration(LocalDateTime.now().plusMinutes(10));
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Reset code has been sent to your email!");
+    }
+
 
     private String generateCode(){
         Random random = new Random();

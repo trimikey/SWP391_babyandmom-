@@ -45,6 +45,8 @@
                 "/swagger-resources/**",
                 "/api/login",
                 "/api/register",
+                "/api/user/forgot",
+                "/api/user/reset",
                 "/api/order/cancel/**",
                 "/api/order//payment-success/**"
         );

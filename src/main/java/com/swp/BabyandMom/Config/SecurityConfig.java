@@ -30,7 +30,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class    SecurityConfig {
     @Autowired
     UserService userService;
 

@@ -4,6 +4,7 @@ import com.swp.BabyandMom.DTO.*;
 import com.swp.BabyandMom.Entity.Enum.UserStatusEnum;
 import com.swp.BabyandMom.Service.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,16 +41,16 @@ public class UserController {
     }
 
     // api dùng trước khi login, không cần authenticate
-//    @PostMapping("/forgot")
-//    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequestDTO requestDTO) {
-//        return userService.forgotPassword(requestDTO);
-//    }
+    @PostMapping("/forgot")
+    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequestDTO requestDTO, HttpSession session) {
+        return userService.forgotPassword(requestDTO, session);
+    }
 
-    // api dùng trước khi login, không cần authenticate
-//    @PutMapping("/reset")
-//    public ResponseEntity<String> resetPassowrd(@RequestBody ResetPasswordRequestDTO resetPasswordRequestDTO){
-//        return userService.resetPassword(resetPasswordRequestDTO);
-//    }
+//     api dùng trước khi login, không cần authenticate
+    @PutMapping("/reset")
+    public ResponseEntity<String> resetPassowrd(@RequestBody ResetPasswordRequestDTO resetPasswordRequestDTO, HttpSession session){
+        return userService.resetPassword(resetPasswordRequestDTO, session);
+    }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping

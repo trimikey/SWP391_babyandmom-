@@ -90,11 +90,11 @@ public class UserService implements UserDetailsService {
 
             logger.info("Login successful: {} - Role: {}", loginRequestDTO.getEmail(), role);
 
-            emailService.sendEmail(
-                    loginRequestDTO.getEmail(),
-                    "Login Notification",
-                    "Welcome " + user.getFullName() + " ! , you have successfully logged in!"
-            );
+//            emailService.sendEmail(
+//                    loginRequestDTO.getEmail(),
+//                    "Login Notification",
+//                    "Welcome " + user.getFullName() + " ! , you have successfully logged in!"
+//            );
 
             return ResponseEntity.ok(new LoginResponseDTO("Login successful", "Success", accessToken, null, role));
 
@@ -150,11 +150,11 @@ public class UserService implements UserDetailsService {
                     "Registered successfully"
             );
 
-            emailService.sendEmail(
-                    registerRequestDTO.getEmail(),
-                    "Account Registration Confirmation",
-                    "Congratulation " + registerRequestDTO.getFullName()+ " ! , you have successfully registered an account !"
-            );
+//            emailService.sendEmail(
+//                    registerRequestDTO.getEmail(),
+//                    "Account Registration Confirmation",
+//                    "Congratulation " + registerRequestDTO.getFullName()+ " ! , you have successfully registered an account !"
+//            );
 
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
         } catch (Exception e) {

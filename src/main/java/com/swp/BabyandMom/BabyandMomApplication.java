@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 @SpringBootApplication
 @EnableScheduling
@@ -27,6 +28,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 		bearerFormat = "JWT",
 		in = SecuritySchemeIn.HEADER
 )
+
 public class BabyandMomApplication {
 	private static final Logger logger = LoggerFactory.getLogger(BabyandMomApplication.class);
 

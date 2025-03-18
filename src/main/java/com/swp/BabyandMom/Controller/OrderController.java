@@ -76,14 +76,14 @@ public class OrderController {
     public ResponseEntity<String> cancelOrder(@PathVariable Long id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
-        
+
         orderService.cancelOrder(id);
         order.setPaymentStatus(PaymentStatus.FAILED);
         orderRepository.save(order);
-        
+
         // Create failed transaction record
         transactionService.createTransaction(order, "PayOS", TransactionStatus.FAILED);
-        
+
         return ResponseEntity.ok("Order cancelled successfully");
     }
 
@@ -91,15 +91,15 @@ public class OrderController {
     public ResponseEntity<String> successOrder(@PathVariable Long id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
-        
+
         orderService.getPaymentSuccessURL(id);
         order.setPaymentStatus(PaymentStatus.COMPLETED);
         order.setStatus(OrderStatus.PAID);
         orderRepository.save(order);
-        
+
         // Create successful transaction record
         transactionService.createTransaction(order, "PayOS", TransactionStatus.COMPLETED);
-        
+
         return ResponseEntity.ok("Order paid successfully");
     }
 

@@ -181,7 +181,8 @@ public class OrderService {
         Order order = new Order();
         order.setUser(user);
         order.setSubscription(subscription);
-        order.setBuyerName(user.getName());
+         // thay doi UserName
+        order.setBuyerName(user.getUserName());
         order.setBuyerEmail(user.getEmail());
         order.setBuyerPhone(user.getPhoneNumber());
         order.setTotalPrice(selectedPackage.getPrice().doubleValue());

@@ -101,6 +101,7 @@ public class BlogPostService {
         return new BlogPostResponseDTO(
                 post.getId(),
                 post.getUser().getId(),
+                post.getUser().getUserName(),
                 post.getTitle(),
                 post.getContent(),
                 post.getCreatedAt(),

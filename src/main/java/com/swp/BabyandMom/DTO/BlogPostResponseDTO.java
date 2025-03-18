@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class BlogPostResponseDTO {
     private Long id;
     private Long userId;
+    private String userName;
     private String title;
     private String content;
     private LocalDateTime createdAt;

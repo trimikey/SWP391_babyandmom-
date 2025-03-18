@@ -48,7 +48,7 @@
                 "/api/user/forgot",
                 "/api/user/reset",
                 "/api/order/cancel/**",
-                "/api/order//payment-success/**"
+                "/api/order/payment-success/**"
         );
 
         //nhận bt api nào là api cần phân quyền

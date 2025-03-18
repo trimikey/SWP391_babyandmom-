@@ -16,6 +16,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -76,14 +78,14 @@ public class OrderController {
     public ResponseEntity<String> cancelOrder(@PathVariable Long id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
-
+        
         orderService.cancelOrder(id);
         order.setPaymentStatus(PaymentStatus.FAILED);
         orderRepository.save(order);
-
+        
         // Create failed transaction record
         transactionService.createTransaction(order, "PayOS", TransactionStatus.FAILED);
-
+        
         return ResponseEntity.ok("Order cancelled successfully");
     }
 
@@ -91,16 +93,15 @@ public class OrderController {
     public ResponseEntity<String> successOrder(@PathVariable Long id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
-
         orderService.getPaymentSuccessURL(id);
         order.setPaymentStatus(PaymentStatus.COMPLETED);
         order.setStatus(OrderStatus.PAID);
         orderRepository.save(order);
-
+        
         // Create successful transaction record
         transactionService.createTransaction(order, "PayOS", TransactionStatus.COMPLETED);
-
-        return ResponseEntity.ok("Order paid successfully");
+        
+        return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION,"http://14.225.210.81/payment/success/"+ id).build();
     }
 
     // API Lấy danh sách đơn hàng theo trạng thái

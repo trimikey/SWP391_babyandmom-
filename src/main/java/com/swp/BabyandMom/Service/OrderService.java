@@ -18,6 +18,7 @@ import com.swp.BabyandMom.Repository.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -91,8 +92,8 @@ public class OrderService {
         order.setTotalPrice(selectedPackage.getPrice().doubleValue());
         order.setStatus(OrderStatus.PENDING);
         order.setCreatedAt(LocalDateTime.now());
-        order.setStartDate(LocalDateTime.now());
-        order.setEndDate(LocalDateTime.now());
+        order.setStartDate(subscription.getStartDate());
+        order.setEndDate(subscription.getEndDate());
         order.setIsDeleted(false);
 
         Order savedOrder = orderRepository.save(order);
@@ -144,7 +145,7 @@ public class OrderService {
             throw new RuntimeException("Payment not completed for this order");
         }
 
-        return "https://BabyAndMom.com/payment-success?orderId=" + orderId;
+            return "https://BabyAndMom.com/payment-success?orderId=" + orderId;
     }
 
 
@@ -180,14 +181,15 @@ public class OrderService {
         Order order = new Order();
         order.setUser(user);
         order.setSubscription(subscription);
-        order.setBuyerName(user.getName());
+         // thay doi UserName
+        order.setBuyerName(user.getUserName());
         order.setBuyerEmail(user.getEmail());
         order.setBuyerPhone(user.getPhoneNumber());
         order.setTotalPrice(selectedPackage.getPrice().doubleValue());
         order.setStatus(OrderStatus.PENDING);
         order.setCreatedAt(LocalDateTime.now());
-        order.setStartDate(LocalDateTime.now());
-        order.setEndDate(LocalDateTime.now());
+        order.setStartDate(subscription.getStartDate());
+        order.setEndDate(subscription.getEndDate());
         order.setIsDeleted(false);
 
         Order savedOrder = orderRepository.save(order);
@@ -199,9 +201,9 @@ public class OrderService {
                 savedOrder.getBuyerPhone(),
                 savedOrder.getTotalPrice(),
                 savedOrder.getStatus(),
+                savedOrder.getCreatedAt(),
                 savedOrder.getStartDate(),
                 savedOrder.getEndDate(),
-                savedOrder.getCreatedAt(),
                 savedOrder.getSubscription().getMembershipPackage().getType().toString()
         );
     }
@@ -240,8 +242,8 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    // Tự động set trạng thái hanj cho gói nếu quá hạn ngày sử dụng
-
+    // Tự động set trạng thái hết hạn cho gói nếu quá hạn ngày sử dụng
+    @Scheduled(cron = "0 0 0 * * ?")    // anotation set chạy tự động
     public void updateExpiredOrders() {
         // Lây ra danh sách đơn hàng ở trạng thái ACTIVE nhưng quá quá date
 

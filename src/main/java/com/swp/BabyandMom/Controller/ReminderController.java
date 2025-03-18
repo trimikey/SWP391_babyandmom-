@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reminder")
@@ -26,7 +28,13 @@ public class ReminderController {
             throw new RuntimeException("Access denied: Only PREMIUM users can access this feature.");
         }
     }
-
+    @GetMapping("/membership/status")
+    public Map<String, Boolean> getMembershipStatus() {
+        Map<String, Boolean> response = new HashMap<>();
+        MembershipType type = userUtils.getUserMembershipType();
+        response.put("isPremium", type == MembershipType.PREMIUM);
+        return response;
+    }
     @GetMapping
     public List<ReminderResponseDTO> getAllReminders() {
         checkPremiumUser();

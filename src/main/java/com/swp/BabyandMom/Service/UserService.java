@@ -173,6 +173,7 @@ public class UserService implements UserDetailsService {
         }
 
         GetProfileResponseDTO response = new GetProfileResponseDTO(
+                account.getId(),
                 account.getFullName(),
                 account.getUserName(),
                 account.getEmail(),

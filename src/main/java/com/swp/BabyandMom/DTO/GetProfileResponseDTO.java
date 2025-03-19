@@ -11,12 +11,22 @@ public class GetProfileResponseDTO {
     private String userName;
     private String email;
     private String phone;
+    private Long id;
 
-    public GetProfileResponseDTO(String fullName, String userName, String email, String phone) {
+    public GetProfileResponseDTO(Long id,String fullName, String userName, String email, String phone) {
         this.fullName = fullName;
         this.userName = userName;
         this.email = email;
         this.phone = phone;
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFullName() {

@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.swp.BabyandMom.Entity.Subscription;
@@ -63,7 +64,6 @@ public class OrderService {
             else if (status == PaymentStatus.FAILED) {
                 order.setStatus(OrderStatus.CANCELED);
             }
-
             orderRepository.save(order);
         });
     }
@@ -168,6 +168,10 @@ public class OrderService {
     public OrderResponseDTO createOrdersByType(MembershipType membershipType) {
         String loggedInEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.getAccountByEmail(loggedInEmail);
+        Optional<Subscription> createdSubcription  = subscriptionRepository.findById(user.getId());
+        if(!createdSubcription.isEmpty()){
+            subscriptionRepository.deleteById(createdSubcription.get().getId());
+        }
         Membership_Package selectedPackage = membershipPackageRepository.findByType(membershipType)
                 .orElseThrow(() -> new RuntimeException("Type not found"));
         Subscription subscription = new Subscription();

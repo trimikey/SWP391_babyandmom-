@@ -1,5 +1,6 @@
 package com.swp.BabyandMom.Service;
 
+import com.swp.BabyandMom.DTO.TransactionResponseDTO;
 import com.swp.BabyandMom.Entity.Order;
 import com.swp.BabyandMom.Entity.Transaction;
 import com.swp.BabyandMom.Entity.User;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
@@ -25,26 +27,32 @@ public class TransactionService {
     @Autowired
     private UserRepository userRepository;
 
-    public List<Transaction> getAllTransactions() {
-        return transactionRepository.findAll();
+    public List<TransactionResponseDTO> getAllTransactions() {
+        return transactionRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    public Transaction getTransactionById(Long id) {
-        return transactionRepository.findById(id)
+    public TransactionResponseDTO getTransactionById(Long id) {
+        Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transaction not found"));
+        return convertToDTO(transaction);
     }
 
-    public List<Transaction> getTransactionsByUserId(Long userId) {
+    public List<TransactionResponseDTO> getTransactionsByUserId(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return transactionRepository.findByUser(user);
+        return transactionRepository.findByUser(user).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    public Transaction getTransactionByOrderId(Long orderId) {
+    public TransactionResponseDTO getTransactionByOrderId(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
-        return transactionRepository.findByOrder(order)
+        Transaction transaction = transactionRepository.findByOrder(order)
                 .orElseThrow(() -> new RuntimeException("Transaction not found"));
+        return convertToDTO(transaction);
     }
 
     public Transaction createTransaction(Order order, String paymentMethod, TransactionStatus status) {
@@ -60,8 +68,22 @@ public class TransactionService {
     }
 
     public void deleteTransaction(Long id) {
-        Transaction transaction = getTransactionById(id);
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
         transaction.setIsDeleted(true);
         transactionRepository.save(transaction);
+    }
+
+    private TransactionResponseDTO convertToDTO(Transaction transaction) {
+        return new TransactionResponseDTO(
+                transaction.getId(),
+                transaction.getUser().getName(),
+                transaction.getOrder().getId(),
+                transaction.getTotalPrice(),
+                transaction.getCreatedAt(),
+                transaction.getPaymentMethod(),
+                transaction.getStatus(),
+                transaction.getIsDeleted()
+        );
     }
 } 

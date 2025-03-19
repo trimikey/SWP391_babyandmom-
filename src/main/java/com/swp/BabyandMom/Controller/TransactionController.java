@@ -1,6 +1,6 @@
 package com.swp.BabyandMom.Controller;
 
-import com.swp.BabyandMom.Entity.Transaction;
+import com.swp.BabyandMom.DTO.TransactionResponseDTO;
 import com.swp.BabyandMom.Service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -23,25 +23,25 @@ public class TransactionController {
     @GetMapping
     @Operation(summary = "Get all transactions")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<Transaction>> getAllTransactions() {
+    public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions() {
         return ResponseEntity.ok(transactionService.getAllTransactions());
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get transaction by ID")
-    public ResponseEntity<Transaction> getTransactionById(@PathVariable Long id) {
+    public ResponseEntity<TransactionResponseDTO> getTransactionById(@PathVariable Long id) {
         return ResponseEntity.ok(transactionService.getTransactionById(id));
     }
 
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get transactions by user ID")
-    public ResponseEntity<List<Transaction>> getTransactionsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<List<TransactionResponseDTO>> getTransactionsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(transactionService.getTransactionsByUserId(userId));
     }
 
     @GetMapping("/order/{orderId}")
     @Operation(summary = "Get transaction by order ID")
-    public ResponseEntity<Transaction> getTransactionByOrderId(@PathVariable Long orderId) {
+    public ResponseEntity<TransactionResponseDTO> getTransactionByOrderId(@PathVariable Long orderId) {
         return ResponseEntity.ok(transactionService.getTransactionByOrderId(orderId));
     }
 

@@ -25,7 +25,7 @@ public class Order {
 
     @JsonIgnore
     @OneToOne
-    @JoinColumn(name = "subscription_id", nullable = false)
+    @JoinColumn(name = "subscription_id", nullable = true)
     private Subscription subscription;
 
     @Column(nullable = true)

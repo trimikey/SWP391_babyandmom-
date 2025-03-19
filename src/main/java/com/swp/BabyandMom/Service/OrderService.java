@@ -70,48 +70,48 @@ public class OrderService {
 
 
 
-    public OrderResponseDTO createOrder(OrderRequestDTO orderDTO) {
-        User user = userService.getAccountByEmail(orderDTO.getBuyerEmail());
-        Membership_Package  selectedPackage = membershipPackageRepository.findByType(orderDTO.getType())
-                .orElseThrow(() -> new RuntimeException("Package not found"));
+    // public OrderResponseDTO createOrder(OrderRequestDTO orderDTO) {
+    //     User user = userService.getAccountByEmail(orderDTO.getBuyerEmail());
+    //     Membership_Package  selectedPackage = membershipPackageRepository.findByType(orderDTO.getType())
+    //             .orElseThrow(() -> new RuntimeException("Package not found"));
 
-        Subscription subscription = new Subscription();
-        subscription.setUser(user);
-        subscription.setMembershipPackage(selectedPackage);
-        subscription.setStartDate(LocalDateTime.now());
-        subscription.setEndDate(LocalDateTime.now().plusMonths(selectedPackage.getDurationInMonths()));
-        subscription.setIsActive(true);
-        subscription = subscriptionRepository.save(subscription);
+    //     Subscription subscription = new Subscription();
+    //     subscription.setUser(user);
+    //     subscription.setMembershipPackage(selectedPackage);
+    //     subscription.setStartDate(LocalDateTime.now());
+    //     subscription.setEndDate(LocalDateTime.now().plusMonths(selectedPackage.getDurationInMonths()));
+    //     subscription.setIsActive(true);
+    //     subscription = subscriptionRepository.save(subscription);
 
-        Order order = new Order();
-        order.setUser(user);
-        order.setSubscription(subscription);
-        order.setBuyerName(user.getName());
-        order.setBuyerEmail(user.getEmail());
-        order.setBuyerPhone(user.getPhoneNumber());
-        order.setTotalPrice(selectedPackage.getPrice().doubleValue());
-        order.setStatus(OrderStatus.PENDING);
-        order.setCreatedAt(LocalDateTime.now());
-        order.setStartDate(subscription.getStartDate());
-        order.setEndDate(subscription.getEndDate());
-        order.setIsDeleted(false);
+    //     Order order = new Order();
+    //     order.setUser(user);
+    //     order.setSubscription(subscription);
+    //     order.setBuyerName(user.getName());
+    //     order.setBuyerEmail(user.getEmail());
+    //     order.setBuyerPhone(user.getPhoneNumber());
+    //     order.setTotalPrice(selectedPackage.getPrice().doubleValue());
+    //     order.setStatus(OrderStatus.PENDING);
+    //     order.setCreatedAt(LocalDateTime.now());
+    //     order.setStartDate(subscription.getStartDate());
+    //     order.setEndDate(subscription.getEndDate());
+    //     order.setIsDeleted(false);
 
-        Order savedOrder = orderRepository.save(order);
+    //     Order savedOrder = orderRepository.save(order);
 
         
-        return new OrderResponseDTO(
-            savedOrder.getId(),
-            savedOrder.getBuyerName(),
-            savedOrder.getBuyerEmail(),
-            savedOrder.getBuyerPhone(),
-            savedOrder.getTotalPrice(),
-            savedOrder.getStatus(),
-            savedOrder.getCreatedAt(),
-            savedOrder.getStartDate(),
-            savedOrder.getEndDate(),
-            savedOrder.getSubscription().getMembershipPackage().getType().toString()
-        );
-    }
+    //     return new OrderResponseDTO(
+    //         savedOrder.getId(),
+    //         savedOrder.getBuyerName(),
+    //         savedOrder.getBuyerEmail(),
+    //         savedOrder.getBuyerPhone(),
+    //         savedOrder.getTotalPrice(),
+    //         savedOrder.getStatus(),
+    //         savedOrder.getCreatedAt(),
+    //         savedOrder.getStartDate(),
+    //         savedOrder.getEndDate(),
+    //         savedOrder.getSubscription().getMembershipPackage().getType().toString()
+    //     );
+    // }
 
     public List<OrderResponseDTO> getOrdersByStatus(OrderStatus status) {
         return orderRepository.findByStatus(status).stream()
@@ -165,21 +165,36 @@ public class OrderService {
     }
 
 
+    @Transactional
     public OrderResponseDTO createOrdersByType(MembershipType membershipType) {
         String loggedInEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.getAccountByEmail(loggedInEmail);
-        Optional<Subscription> createdSubcription  = subscriptionRepository.findById(user.getId());
-        if(!createdSubcription.isEmpty()){
-            subscriptionRepository.deleteById(createdSubcription.get().getId());
+        
+       
+        List<Order> existingOrders = orderRepository.findByUserAndIsDeletedFalse(user);
+        for (Order existingOrder : existingOrders) {
+            Subscription oldSubscription = existingOrder.getSubscription();
+            
+            existingOrder.setSubscription(null);
+            existingOrder.setIsDeleted(true);
+            existingOrder.setStatus(OrderStatus.CANCELED);
+            orderRepository.save(existingOrder);
+            
+            if (oldSubscription != null) {
+                subscriptionRepository.delete(oldSubscription);
+            }
         }
+
         Membership_Package selectedPackage = membershipPackageRepository.findByType(membershipType)
                 .orElseThrow(() -> new RuntimeException("Type not found"));
+        
         Subscription subscription = new Subscription();
         subscription.setUser(user);
         subscription.setMembershipPackage(selectedPackage);
         subscription.setStartDate(LocalDateTime.now());
         subscription.setEndDate(LocalDateTime.now().plusMonths(selectedPackage.getDurationInMonths()));
         subscription.setIsActive(true);
+        
         subscription = subscriptionRepository.save(subscription);
 
         Order order = new Order();
@@ -195,6 +210,7 @@ public class OrderService {
         order.setStartDate(subscription.getStartDate());
         order.setEndDate(subscription.getEndDate());
         order.setIsDeleted(false);
+        order.setPaymentStatus(PaymentStatus.PENDING);
 
         Order savedOrder = orderRepository.save(order);
 

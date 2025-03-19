@@ -2,6 +2,7 @@ package com.swp.BabyandMom.Repository;
 
 import com.swp.BabyandMom.Entity.Enum.OrderStatus;
 import com.swp.BabyandMom.Entity.Order;
+import com.swp.BabyandMom.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,4 +12,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByStatusAndEndDateBefore(OrderStatus status, LocalDateTime now);
     
     List<Order> findByStatus(OrderStatus status);
+    
+    List<Order> findByUserAndIsDeletedFalse(User user);
+
+    void delete(Order order);
 }

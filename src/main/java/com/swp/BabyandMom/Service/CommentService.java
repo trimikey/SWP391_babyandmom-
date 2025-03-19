@@ -107,7 +107,7 @@ public class CommentService {
                 comment.getId(),
                 comment.getBlogPost().getId(),
                 comment.getUser().getId(),
-                comment.getUser().getFullName(),
+                comment.getUser().getUserName(),
                 comment.getContent(),
                 comment.getCreatedAt(),
                 comment.getUpdatedAt()

@@ -77,7 +77,7 @@ public class TransactionService {
     private TransactionResponseDTO convertToDTO(Transaction transaction) {
         return new TransactionResponseDTO(
                 transaction.getId(),
-                transaction.getUser().getName(),
+                transaction.getUser().getUserName(),
                 transaction.getOrder().getId(),
                 transaction.getTotalPrice(),
                 transaction.getCreatedAt(),

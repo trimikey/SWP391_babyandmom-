@@ -415,12 +415,15 @@ public ResponseEntity<String> forgotPassword(ForgotPasswordRequestDTO forgotPass
 
     private UserDTO convertToDTO(User user) {
         return new UserDTO(
+                // them role
+                user.getRole(),
                 user.getId(),
                 user.getFullName(),
                 user.getUserName(),
                 user.getEmail(),
                 user.getPhoneNumber(),
                 user.getStatus()
+
         );
     }
 

@@ -1,5 +1,6 @@
 package com.swp.BabyandMom.DTO;
 
+import com.swp.BabyandMom.Entity.Enum.RoleType;
 import com.swp.BabyandMom.Entity.Enum.UserStatusEnum;
 import lombok.*;
 
@@ -14,14 +15,24 @@ public class UserDTO {
     private String email;
     private String phone;
     private UserStatusEnum status;
+    private RoleType role;
 
-    public UserDTO(Long id, String fullName, String userName, String email, String phone, UserStatusEnum status) {
+    public UserDTO(RoleType role,Long id, String fullName, String userName, String email, String phone, UserStatusEnum status) {
         this.id = id;
         this.fullName = fullName;
         this.userName = userName;
         this.email = email;
         this.phone = phone;
         this.status = status;
+        this.role = role;
+    }
+
+    public RoleType getRole() {
+        return role;
+    }
+
+    public void setRole(RoleType role) {
+        this.role = role;
     }
 
     public Long getId() {

@@ -23,7 +23,7 @@ public class ReminderScheduler {
     private final ReminderRepository reminderRepository;
     private final JavaMailSender mailSender;
 
-    @Scheduled(cron = "0 59 13 * * *", zone = "Asia/Ho_Chi_Minh")
+    @Scheduled(cron = "0 0 8 * * *", zone = "Asia/Ho_Chi_Minh")
     public void sendReminderEmails() {
         try {
             LocalDate today = LocalDate.now();

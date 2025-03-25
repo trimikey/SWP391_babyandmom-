@@ -90,5 +90,19 @@ public class PregnancyProfileService {
         profile.setIsDeleted(true);
         repository.save(profile);
     }
+//    public void deleteProfile(Long id) {
+//        Pregnancy_Profile profile = repository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("Profile not found"));
+//
+//        // Mark related GrowthUpdate records as deleted
+//        List<Growth_Record> updates = growthUpdateRepository.findByProfileId(id);
+//        for (GrowthUpdate update : updates) {
+//            update.setIsDeleted(true);
+//            growthUpdateRepository.save(update);
+//        }
+//
+//        profile.setIsDeleted(true);
+//        repository.save(profile);
+//    }
 
 }

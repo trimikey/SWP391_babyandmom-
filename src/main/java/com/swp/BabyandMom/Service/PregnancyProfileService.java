@@ -2,8 +2,10 @@ package com.swp.BabyandMom.Service;
 
 import com.swp.BabyandMom.DTO.PregnancyProfileRequestDTO;
 import com.swp.BabyandMom.DTO.PregnancyProfileResponseDTO;
+import com.swp.BabyandMom.Entity.Growth_Record;
 import com.swp.BabyandMom.Entity.Pregnancy_Profile;
 import com.swp.BabyandMom.Entity.User;
+import com.swp.BabyandMom.Repository.GrowthRecordRepository;
 import com.swp.BabyandMom.Repository.PregnancyRepository;
 import com.swp.BabyandMom.Utils.UserUtils;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
 public class PregnancyProfileService {
     private final PregnancyRepository repository;
     private final UserUtils userUtils;
-
+    private final GrowthRecordRepository growthRecordRepository;
     public List<PregnancyProfileResponseDTO> getAllProfiles() {
         User currentUser = userUtils.getCurrentAccount();
         return repository.findByUserAndIsDeletedFalse(currentUser).stream()
@@ -84,25 +86,25 @@ public class PregnancyProfileService {
                 profile.getHeight());
     }
 
-    public void deleteProfile(Long id) {
-        Pregnancy_Profile profile = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
-        profile.setIsDeleted(true);
-        repository.save(profile);
-    }
 //    public void deleteProfile(Long id) {
 //        Pregnancy_Profile profile = repository.findById(id)
 //                .orElseThrow(() -> new RuntimeException("Profile not found"));
-//
-//        // Mark related GrowthUpdate records as deleted
-//        List<Growth_Record> updates = growthUpdateRepository.findByProfileId(id);
-//        for (GrowthUpdate update : updates) {
-//            update.setIsDeleted(true);
-//            growthUpdateRepository.save(update);
-//        }
-//
 //        profile.setIsDeleted(true);
 //        repository.save(profile);
 //    }
+    public void deleteProfile(Long id) {
+        Pregnancy_Profile profile = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
+
+        List<Growth_Record> growthRecords = growthRecordRepository.findByPregnancyAndIsDeletedFalse(profile);
+
+        for (Growth_Record record : growthRecords) {
+            record.setIsDeleted(true);
+            growthRecordRepository.save(record);
+        }
+        profile.setIsDeleted(true);
+        repository.save(profile);
+    }
+
 
 }

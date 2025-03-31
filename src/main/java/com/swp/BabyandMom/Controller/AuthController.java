@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 @CrossOrigin("*")
-    
 public class AuthController {
     @Autowired
     private final UserService userService;
@@ -28,6 +27,13 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
         return userService.checkLogin(loginRequestDTO);
+
+
+    }
+
+    @PostMapping("/test")
+    public ResponseEntity<LoginResponseDTO> test(@RequestBody LoginRequestDTO loginRequestDTO) {
+        return null;
 
 
     }

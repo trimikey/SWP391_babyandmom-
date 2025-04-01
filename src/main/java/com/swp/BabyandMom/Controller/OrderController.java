@@ -85,8 +85,8 @@ public class OrderController {
         
         // Create failed transaction record
         transactionService.createTransaction(order, "PayOS", TransactionStatus.FAILED);
-        
-        return ResponseEntity.ok("Order cancelled successfully");
+
+        return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION,"http://14.225.210.81/payment/cancel/"+ id).build();
     }
 
     @GetMapping("/payment-success/{id}")

@@ -56,10 +56,10 @@ public class UserUtils {
 
             if (userWithOrders != null && userWithOrders.getSubscriptions() != null) {
                 return userWithOrders.getSubscriptions().stream()
-                        .map(Subscription::getId) // Lấy ID của Subscription
-                        .map(subscriptionId -> findOrderBySubscriptionId(subscriptionId)) // Tìm Order theo Subscription
-                        .filter(Objects::nonNull) // Loại bỏ null
-                        .anyMatch(order -> order.getPaymentStatus() == PaymentStatus.COMPLETED); // Kiểm tra PaymentStatus
+                        .map(Subscription::getId)
+                        .map(subscriptionId -> findOrderBySubscriptionId(subscriptionId))
+                        .filter(Objects::nonNull)
+                        .anyMatch(order -> order.getPaymentStatus() == PaymentStatus.COMPLETED);
             }
         }
         return false;

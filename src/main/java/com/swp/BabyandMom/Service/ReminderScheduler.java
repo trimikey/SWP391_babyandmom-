@@ -80,7 +80,7 @@ public class ReminderScheduler {
                 </div>
             </body>
             </html>
-            """, user.getFullName(), reminder.getTitle(), reminder.getDescription());
+            """, user.getUserName(), reminder.getTitle(), reminder.getDescription());
 
         helper.setTo(recipientEmail);
         helper.setFrom("your-email@gmail.com");

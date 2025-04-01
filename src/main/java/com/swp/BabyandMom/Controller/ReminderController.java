@@ -28,6 +28,14 @@ public class ReminderController {
             throw new RuntimeException("Access denied: Only PREMIUM users can access this feature.");
         }
     }
+
+    private void checkCompletedPayment() {
+        boolean hasCompletedPayment = userUtils.hasCompletedPayment();
+        if (!hasCompletedPayment) {
+            throw new RuntimeException("Access denied: Payment must be completed to access this feature.");
+        }
+    }
+
     @GetMapping("/membership/status")
     public Map<String, Boolean> getMembershipStatus() {
         Map<String, Boolean> response = new HashMap<>();
@@ -38,30 +46,35 @@ public class ReminderController {
     @GetMapping
     public List<ReminderResponseDTO> getAllReminders() {
         checkPremiumUser();
+        checkCompletedPayment();
         return service.getAllReminders();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ReminderResponseDTO> getReminderById(@PathVariable Long id) {
         checkPremiumUser();
+        checkCompletedPayment();
         return ResponseEntity.ok(service.getReminderById(id));
     }
 
     @PostMapping
     public ReminderResponseDTO createReminder(@RequestBody ReminderRequestDTO request) {
         checkPremiumUser();
+        checkCompletedPayment();
         return service.createReminder(request);
     }
 
     @PutMapping("/{id}")
     public ReminderResponseDTO updateReminder(@PathVariable Long id, @RequestBody ReminderRequestDTO request) {
         checkPremiumUser();
+        checkCompletedPayment();
         return service.updateReminder(id, request);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteReminder(@PathVariable Long id) {
         checkPremiumUser();
+        checkCompletedPayment();
         service.deleteReminder(id);
         return ResponseEntity.ok("Delete successfully");
     }

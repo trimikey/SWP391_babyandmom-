@@ -27,6 +27,14 @@ public class GrowthRecordController {
             throw new RuntimeException("Access denied: Only BASIC or PREMIUM users can access this feature.");
         }
     }
+
+    private void checkCompletedPayment() {
+        boolean hasCompletedPayment = userUtils.hasCompletedPayment();
+        if (!hasCompletedPayment) {
+            throw new RuntimeException("Access denied: Payment must be completed to access this feature.");
+        }
+    }
+
     @GetMapping("/membership/status")
     public Map<String, Boolean> getMembershipStatus() {
         Map<String, Boolean> response = new HashMap<>();
@@ -38,6 +46,7 @@ public class GrowthRecordController {
     @GetMapping("/currents")
     public ResponseEntity<List<GrowthRecordResponseDTO>> getAllGrowthRecords(@RequestBody Map<String, Long> requestBody) {
         checkBasicOrPremiumUser();
+        checkCompletedPayment();
         Long profileId = requestBody.get("profileId");
         return ResponseEntity.ok(growthRecordService.getGrowthRecordsByCurrentUser(profileId));
     }
@@ -45,18 +54,21 @@ public class GrowthRecordController {
     @GetMapping("/current")
     public ResponseEntity<List<GrowthRecordResponseDTO>> getAllGrowthRecords(@RequestParam Long profileId) {
         checkBasicOrPremiumUser();
+        checkCompletedPayment();
         return ResponseEntity.ok(growthRecordService.getGrowthRecordsByCurrentUser(profileId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GrowthRecordResponseDTO> getGrowthRecordById(@PathVariable Long id) {
         checkBasicOrPremiumUser();
+        checkCompletedPayment();
         return ResponseEntity.ok(growthRecordService.getGrowthRecordById(id));
     }
 
     @PostMapping
     public ResponseEntity<GrowthRecordResponseDTO> createGrowthRecord(@RequestBody GrowthRecordRequestDTO request) {
         checkBasicOrPremiumUser();
+        checkCompletedPayment();
         return ResponseEntity.ok(growthRecordService.createGrowthRecord(request));
     }
 
@@ -65,12 +77,14 @@ public class GrowthRecordController {
             @PathVariable Long id,
             @RequestBody GrowthRecordRequestDTO request) {
         checkBasicOrPremiumUser();
+        checkCompletedPayment();
         return ResponseEntity.ok(growthRecordService.updateGrowthRecord(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteGrowthRecord(@PathVariable Long id) {
         checkBasicOrPremiumUser();
+        checkCompletedPayment();
         growthRecordService.deleteRecord(id);
         return ResponseEntity.ok("Delete successfully");
     }

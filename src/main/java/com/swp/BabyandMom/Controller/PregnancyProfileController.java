@@ -28,6 +28,14 @@ public class PregnancyProfileController {
             throw new RuntimeException("Access denied: Only BASIC or PREMIUM users can access this feature.");
         }
     }
+
+    private void checkCompletedPayment() {
+        boolean hasCompletedPayment = userUtils.hasCompletedPayment();
+        if (!hasCompletedPayment) {
+            throw new RuntimeException("Access denied: Payment must be completed to access this feature.");
+        }
+    }
+
     @GetMapping("/membership/status")
     public Map<String, Boolean> getMembershipStatus() {
         Map<String, Boolean> response = new HashMap<>();
@@ -40,30 +48,35 @@ public class PregnancyProfileController {
     @GetMapping
     public List<PregnancyProfileResponseDTO> getAllProfiles() {
         checkBasicOrPremiumUser();
+        checkCompletedPayment();
         return service.getAllProfiles();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PregnancyProfileResponseDTO> getProfileById(@PathVariable Long id) {
         checkBasicOrPremiumUser();
+        checkCompletedPayment();
         return ResponseEntity.ok(service.getPregnancyProfileById(id));
     }
 
     @PostMapping
     public PregnancyProfileResponseDTO createProfile(@RequestBody PregnancyProfileRequestDTO request) {
         checkBasicOrPremiumUser();
+        checkCompletedPayment();
         return service.createProfile(request);
     }
 
     @PutMapping("/{id}")
     public PregnancyProfileResponseDTO updateProfile(@PathVariable Long id, @RequestBody PregnancyProfileRequestDTO request) {
         checkBasicOrPremiumUser();
+        checkCompletedPayment();
         return service.updateProfile(id, request);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProfile(@PathVariable Long id) {
         checkBasicOrPremiumUser();
+        checkCompletedPayment();
         service.deleteProfile(id);
         return ResponseEntity.ok("Delete successfully");
     }

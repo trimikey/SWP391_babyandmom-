@@ -31,14 +31,12 @@ public class ReminderService {
 public List<ReminderResponseDTO> getAllReminders() {
     User currentUser = userUtils.getCurrentAccount();
 
-    // Nếu là ADMIN thì có thể xem tất cả
     if (currentUser.getRole().equals(RoleType.ADMIN)) {
         return repository.findByIsDeletedFalse().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    // Người dùng thường chỉ xem được lời nhắc của mình
     return repository.findByPregnancy_UserAndIsDeletedFalse(currentUser).stream()
             .map(this::convertToDTO)
             .collect(Collectors.toList());

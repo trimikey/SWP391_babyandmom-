@@ -45,30 +45,38 @@ public class GrowthRecordController {
     }
     @GetMapping("/currents")
     public ResponseEntity<List<GrowthRecordResponseDTO>> getAllGrowthRecords(@RequestBody Map<String, Long> requestBody) {
-        checkBasicOrPremiumUser();
-        checkCompletedPayment();
+//        checkBasicOrPremiumUser();
+//        checkCompletedPayment();
         Long profileId = requestBody.get("profileId");
+        return ResponseEntity.ok(growthRecordService.getGrowthRecordsByCurrentUser(profileId));
+    }
+
+    //get currents phien bản truyền id qua param
+    @GetMapping("/by-weeks")
+    public ResponseEntity<List<GrowthRecordResponseDTO>> getGrowthRecordsByWeeks(@RequestParam Long profileId) {
+//        checkBasicOrPremiumUser();
+//        checkCompletedPayment();
         return ResponseEntity.ok(growthRecordService.getGrowthRecordsByCurrentUser(profileId));
     }
 
     @GetMapping("/current")
     public ResponseEntity<List<GrowthRecordResponseDTO>> getAllGrowthRecords(@RequestParam Long profileId) {
-        checkBasicOrPremiumUser();
-        checkCompletedPayment();
+//        checkBasicOrPremiumUser();
+//        checkCompletedPayment();
         return ResponseEntity.ok(growthRecordService.getGrowthRecordsByCurrentUser(profileId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GrowthRecordResponseDTO> getGrowthRecordById(@PathVariable Long id) {
-        checkBasicOrPremiumUser();
-        checkCompletedPayment();
+//        checkBasicOrPremiumUser();
+//        checkCompletedPayment();
         return ResponseEntity.ok(growthRecordService.getGrowthRecordById(id));
     }
 
     @PostMapping
     public ResponseEntity<GrowthRecordResponseDTO> createGrowthRecord(@RequestBody GrowthRecordRequestDTO request) {
-        checkBasicOrPremiumUser();
-        checkCompletedPayment();
+//        checkBasicOrPremiumUser();
+//        checkCompletedPayment();
         return ResponseEntity.ok(growthRecordService.createGrowthRecord(request));
     }
 
@@ -76,16 +84,31 @@ public class GrowthRecordController {
     public ResponseEntity<GrowthRecordResponseDTO> updateGrowthRecord(
             @PathVariable Long id,
             @RequestBody GrowthRecordRequestDTO request) {
-        checkBasicOrPremiumUser();
-        checkCompletedPayment();
+//        checkBasicOrPremiumUser();
+//        checkCompletedPayment();
         return ResponseEntity.ok(growthRecordService.updateGrowthRecord(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteGrowthRecord(@PathVariable Long id) {
-        checkBasicOrPremiumUser();
-        checkCompletedPayment();
+//        checkBasicOrPremiumUser();
+//        checkCompletedPayment();
         growthRecordService.deleteRecord(id);
         return ResponseEntity.ok("Delete successfully");
     }
+
+    @GetMapping("/weight-gain-range")
+    public ResponseEntity<Map<Integer, Map<String, Float>>> getWeightGainRange(@RequestParam Long profileId) {
+//        checkBasicOrPremiumUser();
+//        checkCompletedPayment();
+        return ResponseEntity.ok(growthRecordService.getWeightGainRange(profileId));
+    }
+    @GetMapping("/weight-gain-chart")
+    public ResponseEntity<Map<String, List<Float>>> getWeightGainChart(@RequestParam Long profileId) {
+        //checkBasicOrPremiumUser();
+        //checkCompletedPayment();
+        Map<String, List<Float>> chartData = growthRecordService.getWeightGainChartData(profileId);
+        return ResponseEntity.ok(chartData);
+    }
+
 }

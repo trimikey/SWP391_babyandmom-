@@ -23,7 +23,7 @@ public class Growth_Record {
     @Column(nullable = false)
     private Float pregnancyWeight;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Float pregnancyHeight;
 
     @Column(columnDefinition = "TEXT")
@@ -32,7 +32,7 @@ public class Growth_Record {
     @Column(nullable = false)
     private Float prePregnancyWeight;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Float prePregnancyHeight;
 
     @Column(nullable = false)

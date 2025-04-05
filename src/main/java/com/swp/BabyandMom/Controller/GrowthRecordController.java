@@ -21,10 +21,10 @@ public class GrowthRecordController {
     private final GrowthRecordService growthRecordService;
     private final UserUtils userUtils;
 
-    private void checkBasicOrPremiumUser() {
+    private void checkPremiumUser() {
         MembershipType membershipType = userUtils.getUserMembershipType();
-        if (membershipType != MembershipType.BASIC && membershipType != MembershipType.PREMIUM) {
-            throw new RuntimeException("Access denied: Only BASIC or PREMIUM users can access this feature.");
+        if (membershipType != MembershipType.PREMIUM) {
+            throw new RuntimeException("Access denied: Only PREMIUM users can access this feature.");
         }
     }
 
@@ -45,8 +45,8 @@ public class GrowthRecordController {
     }
     @GetMapping("/currents")
     public ResponseEntity<List<GrowthRecordResponseDTO>> getAllGrowthRecords(@RequestBody Map<String, Long> requestBody) {
-//        checkBasicOrPremiumUser();
-//        checkCompletedPayment();
+        checkPremiumUser();
+        checkCompletedPayment();
         Long profileId = requestBody.get("profileId");
         return ResponseEntity.ok(growthRecordService.getGrowthRecordsByCurrentUser(profileId));
     }
@@ -54,29 +54,29 @@ public class GrowthRecordController {
     //get currents phien bản truyền id qua param
     @GetMapping("/by-weeks")
     public ResponseEntity<List<GrowthRecordResponseDTO>> getGrowthRecordsByWeeks(@RequestParam Long profileId) {
-//        checkBasicOrPremiumUser();
-//        checkCompletedPayment();
+        checkPremiumUser();
+        checkCompletedPayment();
         return ResponseEntity.ok(growthRecordService.getGrowthRecordsByCurrentUser(profileId));
     }
 
     @GetMapping("/current")
     public ResponseEntity<List<GrowthRecordResponseDTO>> getAllGrowthRecords(@RequestParam Long profileId) {
-//        checkBasicOrPremiumUser();
-//        checkCompletedPayment();
+        checkPremiumUser();
+        checkCompletedPayment();
         return ResponseEntity.ok(growthRecordService.getGrowthRecordsByCurrentUser(profileId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GrowthRecordResponseDTO> getGrowthRecordById(@PathVariable Long id) {
-//        checkBasicOrPremiumUser();
-//        checkCompletedPayment();
+        checkPremiumUser();
+        checkCompletedPayment();
         return ResponseEntity.ok(growthRecordService.getGrowthRecordById(id));
     }
 
     @PostMapping
     public ResponseEntity<GrowthRecordResponseDTO> createGrowthRecord(@RequestBody GrowthRecordRequestDTO request) {
-//        checkBasicOrPremiumUser();
-//        checkCompletedPayment();
+        checkPremiumUser();
+        checkCompletedPayment();
         return ResponseEntity.ok(growthRecordService.createGrowthRecord(request));
     }
 
@@ -84,29 +84,29 @@ public class GrowthRecordController {
     public ResponseEntity<GrowthRecordResponseDTO> updateGrowthRecord(
             @PathVariable Long id,
             @RequestBody GrowthRecordRequestDTO request) {
-//        checkBasicOrPremiumUser();
-//        checkCompletedPayment();
+        checkPremiumUser();
+        checkCompletedPayment();
         return ResponseEntity.ok(growthRecordService.updateGrowthRecord(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteGrowthRecord(@PathVariable Long id) {
-//        checkBasicOrPremiumUser();
-//        checkCompletedPayment();
+        checkPremiumUser();
+        checkCompletedPayment();
         growthRecordService.deleteRecord(id);
         return ResponseEntity.ok("Delete successfully");
     }
 
     @GetMapping("/weight-gain-range")
     public ResponseEntity<Map<Integer, Map<String, Float>>> getWeightGainRange(@RequestParam Long profileId) {
-//        checkBasicOrPremiumUser();
-//        checkCompletedPayment();
+        checkPremiumUser();
+        checkCompletedPayment();
         return ResponseEntity.ok(growthRecordService.getWeightGainRange(profileId));
     }
     @GetMapping("/weight-gain-chart")
     public ResponseEntity<Map<String, List<Float>>> getWeightGainChart(@RequestParam Long profileId) {
-        //checkBasicOrPremiumUser();
-        //checkCompletedPayment();
+        checkPremiumUser();
+        checkCompletedPayment();
         Map<String, List<Float>> chartData = growthRecordService.getWeightGainChartData(profileId);
         return ResponseEntity.ok(chartData);
     }
